@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 837894859}
   - component: {fileID: 837894858}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: City
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -445,7 +445,97 @@ Transform:
   m_GameObject: {fileID: 837894857}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1476910807
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1476910809}
+  - component: {fileID: 1476910808}
+  m_Layer: 0
+  m_Name: CityGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1476910808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1476910807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b6ef8ec23fb78478d1fefc05abe2bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CityGenerator
+  width: 10
+  height: 10
+  tileSize: 10
+  buildingPrefabs:
+  - {fileID: 4976880366369161607, guid: 454d6dc1f7e4a464e99f2204dd95c9f0, type: 3}
+  - {fileID: 8576294685000717922, guid: 3a0092e896feaf341bbe0cc0e30b0bbe, type: 3}
+  - {fileID: 650591154451796056, guid: 459bf6bc825ea9845822408053e0b7aa, type: 3}
+  - {fileID: 3021394072774387150, guid: f9be95d7f56731f4b97c4011e28edaab, type: 3}
+  - {fileID: 2661994169556932180, guid: 0972cd229ac9d20489bbc3a57a51be46, type: 3}
+  roadPrefabs:
+  - {fileID: 6241708434642177863, guid: a123fb8bf915c794da2bea3edfebe933, type: 3}
+  - {fileID: 7186611593404455177, guid: 9123a496f00e31842b80b49e7b41ac8b, type: 3}
+  - {fileID: 7893901977543645526, guid: 0ff856192de3db649b1501f64519b29d, type: 3}
+  - {fileID: 3301257244871238459, guid: bbf6aaa394158294db5535dd05892380, type: 3}
+  - {fileID: 3973724822145257907, guid: dae50ba9b3dcb7540888f6c8eacd1220, type: 3}
+  - {fileID: 7546371180376575364, guid: 69b6afc22a2bf5143bb43500f6fdc949, type: 3}
+  - {fileID: 5645840829234244219, guid: 73a9ae2f4eead034a9aa210b6ca9fe2b, type: 3}
+  treePrefabs:
+  - {fileID: 6184434111218818029, guid: 5ed59cd74d779b247a0de3970801fda1, type: 3}
+  - {fileID: 2613924079921196393, guid: 2643cc8c8bd191d4aa2a0f3d50abab65, type: 3}
+  - {fileID: 3489192851198715285, guid: 6ce5d694780084341b1025650bdd432c, type: 3}
+  - {fileID: 2060589233173438422, guid: 8ce6b6e7fcdc39243881ee68d05db72a, type: 3}
+  - {fileID: 5716472912363847415, guid: dae355c214058de40833e1dc07b9568c, type: 3}
+  propPrefabs:
+  - {fileID: 7610191141841524461, guid: e27f6d0f11d27244e8161b7f0622acc3, type: 3}
+  - {fileID: 2224662085530796571, guid: f626965b9f5948044bcbba46644d0cce, type: 3}
+  - {fileID: 1002248276484595603, guid: 25bbb1747c06f4b40a3e6f650711063e, type: 3}
+  - {fileID: 6630534384500338990, guid: 40982eb6dcde6a04cb132258ee0a8c2e, type: 3}
+  - {fileID: 9162471113531258047, guid: 66d271533f6d75c49ae9d706f6882fe6, type: 3}
+  - {fileID: 4868475246395876155, guid: 0cc8a06d3a3346548bb4bb92ee2a569c, type: 3}
+  - {fileID: 5562890943874257140, guid: b5ec79143a507e74d878f65422c4f863, type: 3}
+  - {fileID: 7195187737987913630, guid: d3e0ea8d2ad84a44b9969cd6eb557c95, type: 3}
+  - {fileID: 7733277219335523361, guid: c840005cc45aef44f9deddd8aa7c06ff, type: 3}
+  - {fileID: 5410144977561730994, guid: 8728988bc3acc5a46a01657234323304, type: 3}
+  - {fileID: 2311571893751504399, guid: 4a6a6a5f5ddb6ff419905ada63dcf371, type: 3}
+  - {fileID: 6252343956108156183, guid: 54ccd45fca627784b9f3f4028cc94cb1, type: 3}
+  - {fileID: 8167637314619819411, guid: 75a3e906beef3c14598e4977c628114c, type: 3}
+  - {fileID: 184116294522184614, guid: b5093371031d8f042b570850db51e4c8, type: 3}
+  - {fileID: 7546771523220581105, guid: 90f04355ba51ba74e8446c8a05abd7cd, type: 3}
+  - {fileID: 3104409772787331105, guid: 55f28c2c2c68d44478d135571a1b5e41, type: 3}
+  - {fileID: 6345538668197865643, guid: 5a2bcda7ce7dee34d932df6cc8aae273, type: 3}
+  - {fileID: 5092599032398832568, guid: 155fea5be9ec1d84686b43b5690cc40e, type: 3}
+  - {fileID: 7655624422900283337, guid: f57af0b5f5a0afc47ac96c710defad7a, type: 3}
+  - {fileID: 3721384110733165218, guid: 1c2918fe314f83c41b8b492cb71218bc, type: 3}
+  treeChance: 0.2
+  propChance: 0.15
+--- !u!4 &1476910809
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1476910807}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -458,3 +548,4 @@ SceneRoots:
   - {fileID: 708544731}
   - {fileID: 506443972}
   - {fileID: 837894861}
+  - {fileID: 1476910809}
