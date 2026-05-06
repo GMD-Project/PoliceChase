@@ -23,7 +23,10 @@ public class CityGenerator : MonoBehaviour
     [Header("Building & Decoration")]
     public GameObject[] buildingPrefabs;
     public GameObject[] treePrefabs;
-    public GameObject[] propPrefabs;
+    [Header("Road Props")]
+    public GameObject[] trafficLightPrefabs;
+    public GameObject[] signPrefabs;
+[   Range(0f, 1f)] public float signChance = 0.3f;
 
     [Header("Chances")]
     [Range(0f, 1f)] public float treeChance = 0.2f;
@@ -60,8 +63,6 @@ public class CityGenerator : MonoBehaviour
                 if (Random.value < treeChance)
                     SpawnRandom(treePrefabs, position + new Vector3(3, 0, 3), Quaternion.identity);
 
-                if (Random.value < propChance)
-                    SpawnRandom(propPrefabs, position + new Vector3(-3, 0, -3), Quaternion.identity);
             }
         }
     }
@@ -112,6 +113,30 @@ public class CityGenerator : MonoBehaviour
     }
 
     SpawnRandom(prefabs, position, Quaternion.Euler(0, yRot, 0));
+    float edge = tileSize * 0.4f;
+
+    if (connections == 4)
+    {
+        // traffic light at each corner of the crossroads
+        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge));
+        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge));
+        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge));
+        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge));
+    }
+    else if (connections == 3)
+    {
+        // traffic lights only on the two corners of the closed side
+        if      (!w) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge)); }
+        else if (!e) { SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge)); }
+        else if (!n) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge)); }
+        else         { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge)); }
+    }
+    else if (connections == 2 && (n && s || e && w) && Random.value < signChance)
+    {
+        // sign on one side of a straight road, perpendicular to travel direction
+        Vector3 sideOffset = (n && s) ? new Vector3(edge, 0, 0) : new Vector3(0, 0, edge);
+        SpawnProp(signPrefabs, position + sideOffset);
+    }
 }
     bool IsRoad(int x, int z)
     {
@@ -131,4 +156,11 @@ public class CityGenerator : MonoBehaviour
         if (prefabs.Length == 0) return;
         Instantiate(prefabs[Random.Range(0, prefabs.Length)], pos, rot, transform);
     }
+    void SpawnProp(GameObject[] prefabs, Vector3 position)
+    {
+        if (prefabs.Length == 0) return;
+        GameObject prefab = prefabs[Random.Range(0, prefabs.Length)];
+        Instantiate(prefab, position, Quaternion.identity, transform);
+    }
+
 }
