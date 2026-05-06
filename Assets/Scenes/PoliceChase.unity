@@ -483,20 +483,30 @@ MonoBehaviour:
   width: 10
   height: 10
   tileSize: 10
+  straightPrefabs:
+  - {fileID: 8238353210620473497, guid: 7dd5d8d728c6ce345b1ce9796588b843, type: 3}
+  - {fileID: 4412122052823812425, guid: 7192bd53105203e40943cfe63c601702, type: 3}
+  - {fileID: 7546371180376575364, guid: 69b6afc22a2bf5143bb43500f6fdc949, type: 3}
+  cornerPrefabs:
+  - {fileID: 6241708434642177863, guid: a123fb8bf915c794da2bea3edfebe933, type: 3}
+  - {fileID: 7331023810881215806, guid: 17aa00ea20c559546b708797ece5f551, type: 3}
+  - {fileID: 5645840829234244219, guid: 73a9ae2f4eead034a9aa210b6ca9fe2b, type: 3}
+  tIntersectionPrefabs:
+  - {fileID: 3973724822145257907, guid: dae50ba9b3dcb7540888f6c8eacd1220, type: 3}
+  - {fileID: 8395529729467324237, guid: 0c619af28f435d3488ec0285736ee8f0, type: 3}
+  - {fileID: 6708352524897075009, guid: aa1ee9fd9a393214a8204b214f04524a, type: 3}
+  crossroadPrefabs:
+  - {fileID: 7186611593404455177, guid: 9123a496f00e31842b80b49e7b41ac8b, type: 3}
+  - {fileID: 8236138214116046233, guid: d34be6ef738541a41aa8e2bb204076f4, type: 3}
+  deadEndPrefabs:
+  - {fileID: 7893901977543645526, guid: 0ff856192de3db649b1501f64519b29d, type: 3}
+  - {fileID: 867190217525862037, guid: 7be5369fc275971458de9b7f2505e630, type: 3}
   buildingPrefabs:
   - {fileID: 4976880366369161607, guid: 454d6dc1f7e4a464e99f2204dd95c9f0, type: 3}
   - {fileID: 8576294685000717922, guid: 3a0092e896feaf341bbe0cc0e30b0bbe, type: 3}
   - {fileID: 650591154451796056, guid: 459bf6bc825ea9845822408053e0b7aa, type: 3}
   - {fileID: 3021394072774387150, guid: f9be95d7f56731f4b97c4011e28edaab, type: 3}
   - {fileID: 2661994169556932180, guid: 0972cd229ac9d20489bbc3a57a51be46, type: 3}
-  roadPrefabs:
-  - {fileID: 6241708434642177863, guid: a123fb8bf915c794da2bea3edfebe933, type: 3}
-  - {fileID: 7186611593404455177, guid: 9123a496f00e31842b80b49e7b41ac8b, type: 3}
-  - {fileID: 7893901977543645526, guid: 0ff856192de3db649b1501f64519b29d, type: 3}
-  - {fileID: 3301257244871238459, guid: bbf6aaa394158294db5535dd05892380, type: 3}
-  - {fileID: 3973724822145257907, guid: dae50ba9b3dcb7540888f6c8eacd1220, type: 3}
-  - {fileID: 7546371180376575364, guid: 69b6afc22a2bf5143bb43500f6fdc949, type: 3}
-  - {fileID: 5645840829234244219, guid: 73a9ae2f4eead034a9aa210b6ca9fe2b, type: 3}
   treePrefabs:
   - {fileID: 6184434111218818029, guid: 5ed59cd74d779b247a0de3970801fda1, type: 3}
   - {fileID: 2613924079921196393, guid: 2643cc8c8bd191d4aa2a0f3d50abab65, type: 3}
