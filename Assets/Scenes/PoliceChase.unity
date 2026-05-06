@@ -446,7 +446,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 50, y: 5, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -480,8 +480,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b6ef8ec23fb78478d1fefc05abe2bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CityGenerator
-  width: 10
-  height: 10
+  width: 50
+  height: 50
   tileSize: 10
   straightPrefabs:
   - {fileID: 8238353210620473497, guid: 7dd5d8d728c6ce345b1ce9796588b843, type: 3}
@@ -513,27 +513,9 @@ MonoBehaviour:
   - {fileID: 3489192851198715285, guid: 6ce5d694780084341b1025650bdd432c, type: 3}
   - {fileID: 2060589233173438422, guid: 8ce6b6e7fcdc39243881ee68d05db72a, type: 3}
   - {fileID: 5716472912363847415, guid: dae355c214058de40833e1dc07b9568c, type: 3}
-  propPrefabs:
-  - {fileID: 7610191141841524461, guid: e27f6d0f11d27244e8161b7f0622acc3, type: 3}
-  - {fileID: 2224662085530796571, guid: f626965b9f5948044bcbba46644d0cce, type: 3}
-  - {fileID: 1002248276484595603, guid: 25bbb1747c06f4b40a3e6f650711063e, type: 3}
-  - {fileID: 6630534384500338990, guid: 40982eb6dcde6a04cb132258ee0a8c2e, type: 3}
-  - {fileID: 9162471113531258047, guid: 66d271533f6d75c49ae9d706f6882fe6, type: 3}
-  - {fileID: 4868475246395876155, guid: 0cc8a06d3a3346548bb4bb92ee2a569c, type: 3}
-  - {fileID: 5562890943874257140, guid: b5ec79143a507e74d878f65422c4f863, type: 3}
-  - {fileID: 7195187737987913630, guid: d3e0ea8d2ad84a44b9969cd6eb557c95, type: 3}
-  - {fileID: 7733277219335523361, guid: c840005cc45aef44f9deddd8aa7c06ff, type: 3}
-  - {fileID: 5410144977561730994, guid: 8728988bc3acc5a46a01657234323304, type: 3}
-  - {fileID: 2311571893751504399, guid: 4a6a6a5f5ddb6ff419905ada63dcf371, type: 3}
-  - {fileID: 6252343956108156183, guid: 54ccd45fca627784b9f3f4028cc94cb1, type: 3}
-  - {fileID: 8167637314619819411, guid: 75a3e906beef3c14598e4977c628114c, type: 3}
-  - {fileID: 184116294522184614, guid: b5093371031d8f042b570850db51e4c8, type: 3}
-  - {fileID: 7546771523220581105, guid: 90f04355ba51ba74e8446c8a05abd7cd, type: 3}
-  - {fileID: 3104409772787331105, guid: 55f28c2c2c68d44478d135571a1b5e41, type: 3}
-  - {fileID: 6345538668197865643, guid: 5a2bcda7ce7dee34d932df6cc8aae273, type: 3}
-  - {fileID: 5092599032398832568, guid: 155fea5be9ec1d84686b43b5690cc40e, type: 3}
-  - {fileID: 7655624422900283337, guid: f57af0b5f5a0afc47ac96c710defad7a, type: 3}
-  - {fileID: 3721384110733165218, guid: 1c2918fe314f83c41b8b492cb71218bc, type: 3}
+  trafficLightPrefabs: []
+  signPrefabs: []
+  signChance: 0.3
   treeChance: 0.2
   propChance: 0.15
 --- !u!4 &1476910809

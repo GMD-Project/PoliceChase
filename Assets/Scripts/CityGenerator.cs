@@ -3,8 +3,8 @@ using System.Collections.Generic;
 public class CityGenerator : MonoBehaviour
 {
     [Header("City Size")]
-    public int width  = 80;
-    public int height = 70;
+    public int width  = 200;
+    public int height = 500;
     public float tileSize = 10f;
 
     [Header("Road Prefabs by Type")]
@@ -34,89 +34,123 @@ void GenerateCity()
 {
     bool[,] isRoad = new bool[width, height];
 
-    List<Vector2Int> junctions = GenerateJunctions();
+    List<int> colRoads = GenerateRoadLines(width);
+    List<int> rowRoads = GenerateRoadLines(height);
 
-    foreach (var j in junctions)
-        isRoad[j.x, j.y] = true;
+    // Mark all intersection points
+foreach (int col in colRoads)
+    foreach (int row in rowRoads)
+        isRoad[col, row] = true;
 
-    ConnectJunctions(isRoad, junctions);
+// Draw horizontal segments between intersections, randomly skipping some
+foreach (int row in rowRoads)
+{
+    for (int i = 0; i < colRoads.Count - 1; i++)
+    {
+        if (Random.value < 0.2f) continue; // 20% chance to leave a gap
+        for (int x = colRoads[i]; x <= colRoads[i + 1]; x++)
+            isRoad[x, row] = true;
+    }
+}
+
+// Draw vertical segments between intersections, randomly skipping some
+foreach (int col in colRoads)
+{
+    for (int j = 0; j < rowRoads.Count - 1; j++)
+    {
+        if (Random.value < 0.2f) continue;
+        for (int z = rowRoads[j]; z <= rowRoads[j + 1]; z++)
+            isRoad[col, z] = true;
+    }
+}
+
+    AddOrganicConnectors(isRoad);
     FixIsolatedAreas(isRoad);
+    EnsureRoadAccess(isRoad); 
 
+    for (int x = 0; x < width; x++)
+        for (int z = 0; z < height; z++)
+        {
+            Vector3 pos = new Vector3(x * tileSize, 0, z * tileSize);
+            if (isRoad[x, z]) SpawnRoad(isRoad, x, z, pos);
+            else SpawnRandomBuilding(pos);
+        }
+        Debug.Log($"Generating city: {width} x {height}");
+}
+
+   List<int> GenerateRoadLines(int size)
+{
+    List<int> roads = new List<int>();
+    int pos = 0;
+    while (pos < size)
+    {
+        roads.Add(pos);
+        pos += Random.Range(5, 10);
+    }
+
+    // Only add the far edge if it won't sit directly next to the last road
+    if (size - 1 - roads[roads.Count - 1] > 1)
+        roads.Add(size - 1);
+
+    return roads;
+}
+
+void EnsureRoadAccess(bool[,] isRoad)
+{
     for (int x = 0; x < width; x++)
     {
         for (int z = 0; z < height; z++)
         {
-            Vector3 position = new Vector3(x * tileSize, 0, z * tileSize);
-            if (isRoad[x, z])
-                SpawnRoad(isRoad, x, z, position);
-            else
-                SpawnRandomBuilding(position);
+            if (isRoad[x, z]) continue;
+            if (HasRoadNeighbour(isRoad, x, z)) continue;
+
+            // Find the nearest road tile
+            int nearestX = -1, nearestZ = -1, bestDist = int.MaxValue;
+            for (int rx = 0; rx < width; rx++)
+                for (int rz = 0; rz < height; rz++)
+                    if (isRoad[rx, rz])
+                    {
+                        int d = Mathf.Abs(rx - x) + Mathf.Abs(rz - z);
+                        if (d < bestDist) { bestDist = d; nearestX = rx; nearestZ = rz; }
+                    }
+
+            if (nearestX < 0) continue;
+
+            // Walk from this tile toward the nearest road, marking each step
+            int cx = x, cz = z;
+            while (cx != nearestX || cz != nearestZ)
+            {
+                isRoad[cx, cz] = true;
+                if (cx != nearestX) cx += nearestX > cx ? 1 : -1;
+                else                cz += nearestZ > cz ? 1 : -1;
+            }
         }
     }
 }
 
-List<Vector2Int> GenerateJunctions()
+bool HasRoadNeighbour(bool[,] isRoad, int x, int z)
 {
-    List<Vector2Int> junctions = new List<Vector2Int>();
-    int spacing = 4; // was 7
+    return (x > 0        && isRoad[x - 1, z]) ||
+           (x < width-1  && isRoad[x + 1, z]) ||
+           (z > 0        && isRoad[x, z - 1]) ||
+           (z < height-1 && isRoad[x, z + 1]);
+}
 
-    for (int x = spacing / 2; x < width; x += spacing)
+    void AddOrganicConnectors(bool[,] isRoad)
+{
+    int count = (width + height) / 12; // was /6
+    for (int i = 0; i < count; i++)
     {
-        for (int z = spacing / 2; z < height; z += spacing)
-        {
-            int jx = Mathf.Clamp(x + Random.Range(-1, 2), 1, width - 2);
-            int jz = Mathf.Clamp(z + Random.Range(-1, 2), 1, height - 2);
-            junctions.Add(new Vector2Int(jx, jz));
-        }
+        int x1 = Random.Range(1, width - 1);
+        int z1 = Random.Range(1, height - 1);
+        int x2 = Mathf.Clamp(x1 + Random.Range(-4, 5), 1, width - 2);
+        int z2 = Mathf.Clamp(z1 + Random.Range(-4, 5), 1, height - 2);
+
+        for (int x = Mathf.Min(x1, x2); x <= Mathf.Max(x1, x2); x++)
+            isRoad[x, z1] = true;
+        for (int z = Mathf.Min(z1, z2); z <= Mathf.Max(z1, z2); z++)
+            isRoad[x2, z] = true;
     }
-    return junctions;
-}
-
-void ConnectJunctions(bool[,] isRoad, List<Vector2Int> junctions)
-{
-    for (int i = 0; i < junctions.Count; i++)
-    {
-        for (int j = i + 1; j < junctions.Count; j++)
-        {
-            // Connect all junction pairs that are close enough
-            if (ManhattanDist(junctions[i], junctions[j]) <= 12)
-                DrawLShapedRoad(isRoad, junctions[i], junctions[j]);
-        }
-    }
-}
-
-void DrawLShapedRoad(bool[,] isRoad, Vector2Int a, Vector2Int b)
-{
-    // Randomly pick which corner the L turns at, so routes vary
-    if (Random.value < 0.5f)
-    {
-        DrawHorizontal(isRoad, a.x, b.x, a.y);
-        DrawVertical(isRoad, a.y, b.y, b.x);
-    }
-    else
-    {
-        DrawVertical(isRoad, a.y, b.y, a.x);
-        DrawHorizontal(isRoad, a.x, b.x, b.y);
-    }
-}
-
-void DrawHorizontal(bool[,] isRoad, int x1, int x2, int z)
-{
-    for (int x = Mathf.Min(x1, x2); x <= Mathf.Max(x1, x2); x++)
-        if (x >= 0 && x < width && z >= 0 && z < height)
-            isRoad[x, z] = true;
-}
-
-void DrawVertical(bool[,] isRoad, int z1, int z2, int x)
-{
-    for (int z = Mathf.Min(z1, z2); z <= Mathf.Max(z1, z2); z++)
-        if (x >= 0 && x < width && z >= 0 && z < height)
-            isRoad[x, z] = true;
-}
-
-int ManhattanDist(Vector2Int a, Vector2Int b)
-{
-    return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
 }
 
 void FixIsolatedAreas(bool[,] isRoad)
@@ -151,12 +185,11 @@ void FixIsolatedAreas(bool[,] isRoad)
                 }
             }
 
-            // If the island is too large, cut a road through its centre
-            if (island.Count > 4)
+            if (island.Count > 10)
             {
                 Vector2Int centre = island[island.Count / 2];
-                // Draw a road horizontally through the centre of the island
-                DrawHorizontal(isRoad, centre.x - 2, centre.x + 2, centre.y);
+                for (int x = Mathf.Max(0, centre.x - 2); x <= Mathf.Min(width - 1, centre.x + 2); x++)
+                    isRoad[x, centre.y] = true;
             }
         }
     }
