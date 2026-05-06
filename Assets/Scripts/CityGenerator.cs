@@ -37,23 +37,22 @@ void GenerateCity()
     List<int> colRoads = GenerateRoadLines(width);
     List<int> rowRoads = GenerateRoadLines(height);
 
-    // Mark all intersection points
+   
 foreach (int col in colRoads)
     foreach (int row in rowRoads)
         isRoad[col, row] = true;
 
-// Draw horizontal segments between intersections, randomly skipping some
+
 foreach (int row in rowRoads)
 {
     for (int i = 0; i < colRoads.Count - 1; i++)
     {
-        if (Random.value < 0.2f) continue; // 20% chance to leave a gap
+        if (Random.value < 0.2f) continue;
         for (int x = colRoads[i]; x <= colRoads[i + 1]; x++)
             isRoad[x, row] = true;
     }
 }
 
-// Draw vertical segments between intersections, randomly skipping some
 foreach (int col in colRoads)
 {
     for (int j = 0; j < rowRoads.Count - 1; j++)
@@ -64,10 +63,7 @@ foreach (int col in colRoads)
     }
 }
 
-    AddOrganicConnectors(isRoad);
-    FixIsolatedAreas(isRoad);
-    EnsureRoadAccess(isRoad); 
-
+ EnsureRoadAccess(isRoad);
     for (int x = 0; x < width; x++)
         for (int z = 0; z < height; z++)
         {
@@ -75,7 +71,7 @@ foreach (int col in colRoads)
             if (isRoad[x, z]) SpawnRoad(isRoad, x, z, pos);
             else SpawnRandomBuilding(pos);
         }
-        Debug.Log($"Generating city: {width} x {height}");
+      
 }
 
    List<int> GenerateRoadLines(int size)
@@ -85,10 +81,9 @@ foreach (int col in colRoads)
     while (pos < size)
     {
         roads.Add(pos);
-        pos += Random.Range(5, 10);
+        pos += Random.Range(7, 13);
     }
 
-    // Only add the far edge if it won't sit directly next to the last road
     if (size - 1 - roads[roads.Count - 1] > 1)
         roads.Add(size - 1);
 
@@ -97,32 +92,66 @@ foreach (int col in colRoads)
 
 void EnsureRoadAccess(bool[,] isRoad)
 {
-    for (int x = 0; x < width; x++)
+    bool changed = true;
+    while (changed)
     {
-        for (int z = 0; z < height; z++)
+        changed = false;
+        bool[,] visited = new bool[width, height];
+
+        for (int startX = 0; startX < width; startX++)
         {
-            if (isRoad[x, z]) continue;
-            if (HasRoadNeighbour(isRoad, x, z)) continue;
-
-            // Find the nearest road tile
-            int nearestX = -1, nearestZ = -1, bestDist = int.MaxValue;
-            for (int rx = 0; rx < width; rx++)
-                for (int rz = 0; rz < height; rz++)
-                    if (isRoad[rx, rz])
-                    {
-                        int d = Mathf.Abs(rx - x) + Mathf.Abs(rz - z);
-                        if (d < bestDist) { bestDist = d; nearestX = rx; nearestZ = rz; }
-                    }
-
-            if (nearestX < 0) continue;
-
-            // Walk from this tile toward the nearest road, marking each step
-            int cx = x, cz = z;
-            while (cx != nearestX || cz != nearestZ)
+            for (int startZ = 0; startZ < height; startZ++)
             {
-                isRoad[cx, cz] = true;
-                if (cx != nearestX) cx += nearestX > cx ? 1 : -1;
-                else                cz += nearestZ > cz ? 1 : -1;
+                if (isRoad[startX, startZ] || visited[startX, startZ]) continue;
+// Flood fill to find the full building cluster
+                List<Vector2Int> cluster = new List<Vector2Int>();
+                Queue<Vector2Int> queue = new Queue<Vector2Int>();
+                queue.Enqueue(new Vector2Int(startX, startZ));
+                visited[startX, startZ] = true;
+
+                while (queue.Count > 0)
+                {
+                    Vector2Int cell = queue.Dequeue();
+                    cluster.Add(cell);
+                    foreach (var dir in new[] { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down })
+                    {
+                        Vector2Int next = cell + dir;
+                        if (next.x < 0 || next.x >= width || next.y < 0 || next.y >= height)
+                         continue;
+                        if (visited[next.x, next.y] || isRoad[next.x, next.y]) 
+                        continue;
+                        visited[next.x, next.y] = true;
+                        queue.Enqueue(next);
+                    }
+                }
+
+                bool needsFix = false;
+                foreach (var t in cluster)
+                    if (!HasRoadNeighbour(isRoad, t.x, t.y)) { needsFix = true; break; }
+
+                if (!needsFix) continue;
+
+                
+                int minX = int.MaxValue, maxX = int.MinValue;
+                int minZ = int.MaxValue, maxZ = int.MinValue;
+                foreach (var t in cluster)
+                {
+                    if (t.x < minX) minX = t.x;
+                    if (t.x > maxX) maxX = t.x;
+                    if (t.y < minZ) minZ = t.y;
+                    if (t.y > maxZ) maxZ = t.y;
+                }
+
+                int centerX = (minX + maxX) / 2;
+                int centerZ = (minZ + maxZ) / 2;
+
+               
+                for (int x = minX; x <= maxX; x++)
+                    if (!isRoad[x, centerZ]) { isRoad[x, centerZ] = true; changed = true; }
+
+                if (maxZ - minZ > 2)
+                    for (int z = minZ; z <= maxZ; z++)
+                        if (!isRoad[centerX, z]) { isRoad[centerX, z] = true; changed = true; }
             }
         }
     }
@@ -138,13 +167,16 @@ bool HasRoadNeighbour(bool[,] isRoad, int x, int z)
 
     void AddOrganicConnectors(bool[,] isRoad)
 {
-    int count = (width + height) / 12; // was /6
+    int count = (width + height) / 16;
     for (int i = 0; i < count; i++)
     {
         int x1 = Random.Range(1, width - 1);
         int z1 = Random.Range(1, height - 1);
-        int x2 = Mathf.Clamp(x1 + Random.Range(-4, 5), 1, width - 2);
-        int z2 = Mathf.Clamp(z1 + Random.Range(-4, 5), 1, height - 2);
+
+        if (isRoad[x1, z1]) continue;
+
+        int x2 = Mathf.Clamp(x1 + Random.Range(-3, 4), 1, width - 2);
+        int z2 = Mathf.Clamp(z1 + Random.Range(-3, 4), 1, height - 2);
 
         for (int x = Mathf.Min(x1, x2); x <= Mathf.Max(x1, x2); x++)
             isRoad[x, z1] = true;
@@ -246,7 +278,6 @@ void FixIsolatedAreas(bool[,] isRoad)
     }
     else if (connections == 3)
     {
-        // traffic lights only on the two corners of the closed side
         if      (!w) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge), Quaternion.Euler(0,0,0)); }
         else if (!e) { SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge), Quaternion.Euler(0,0,0)); }
         else if (!n) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge), Quaternion.Euler(0,0,0)); }
