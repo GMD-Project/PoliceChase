@@ -1,11 +1,4 @@
 using UnityEngine;
-
-// Expected prefab orientations (all measured at Y-rotation 0):
-//   straightPrefabs     – road runs North↔South
-//   cornerPrefabs       – road opens to North and East (inner corner at SW)
-//   tIntersectionPrefabs– road opens to North, South, East  (West side is closed)
-//   crossroadPrefabs    – 4-way intersection, rotation-symmetric
-//   deadEndPrefabs      – open end faces North (road enters from North, cap at South)
 public class CityGenerator : MonoBehaviour
 {
     [Header("City Size")]
@@ -40,12 +33,12 @@ public class CityGenerator : MonoBehaviour
 {
     bool[,] isRoad = new bool[width, height];
 
-    // Pass 1: mark road cells
+  
     for (int x = 0; x < width; x++)
         for (int z = 0; z < height; z++)
             isRoad[x, z] = x % 3 == 0 || z % 3 == 0;
 
-    // Pass 2: spawn tiles
+   
     for (int x = 0; x < width; x++)
     {
         for (int z = 0; z < height; z++)
@@ -89,24 +82,20 @@ public class CityGenerator : MonoBehaviour
 
         case 3:
             prefabs = tIntersectionPrefabs;
-            // rotate so the closed side faces the missing direction
             yRot = !s ? 0f : !w ? 90f : !n ? 180f : 270f;
             break;
 
         case 2 when (n && s) || (e && w):
             prefabs = straightPrefabs;
-            // prefab is N-S by default; rotate 90 for E-W
             yRot = (n && s) ? 90f : 0f;
             break;
 
         case 2:
             prefabs = cornerPrefabs;
-            // prefab opens N+E by default
             yRot = (n && e) ? 0f : (s && e) ? 90f : (s && w) ? 180f : 270f;
             break;
 
         default:
-            // dead end or isolated — fall back to a straight
             prefabs = straightPrefabs;
             yRot = (e || w) ? 90f : 0f;
             break;
@@ -117,25 +106,36 @@ public class CityGenerator : MonoBehaviour
 
     if (connections == 4)
     {
-        // traffic light at each corner of the crossroads
-        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge));
-        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge));
-        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge));
-        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge));
+        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge), Quaternion.Euler(0,0,0));
+        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge), Quaternion.Euler(0,0,0));
+        SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge), Quaternion.Euler(0,0,0));
+        SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge), Quaternion.Euler(0,0,0));
     }
     else if (connections == 3)
     {
         // traffic lights only on the two corners of the closed side
-        if      (!w) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge)); }
-        else if (!e) { SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge)); }
-        else if (!n) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge)); }
-        else         { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge)); }
+        if      (!w) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge), Quaternion.Euler(0,0,0)); }
+        else if (!e) { SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge), Quaternion.Euler(0,0,0)); }
+        else if (!n) { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0,  edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0,  edge), Quaternion.Euler(0,0,0)); }
+        else         { SpawnProp(trafficLightPrefabs, position + new Vector3(-edge, 0, -edge), Quaternion.Euler(0,0,0)); SpawnProp(trafficLightPrefabs, position + new Vector3( edge, 0, -edge), Quaternion.Euler(0,0,0)); }
     }
     else if (connections == 2 && (n && s || e && w) && Random.value < signChance)
     {
-        // sign on one side of a straight road, perpendicular to travel direction
-        Vector3 sideOffset = (n && s) ? new Vector3(edge, 0, 0) : new Vector3(0, 0, edge);
-        SpawnProp(signPrefabs, position + sideOffset);
+        if(n&&s)
+        {
+         bool eastSide = Random.value < 0.5f;
+         Vector3 sideOffset = new Vector3(eastSide?edge : -edge, 0, 0);
+          float yRotation = eastSide ? 180f : 0f;
+          SpawnProp(signPrefabs, position + sideOffset, Quaternion.Euler(0, yRotation, 0));
+        }
+       else
+       {
+        bool northSide = Random.value < 0.5f;
+         Vector3 sideOffset = new Vector3(0, 0, northSide?edge : -edge);
+          float yRotation = northSide ? 270f : 90f;
+          SpawnProp(signPrefabs, position + sideOffset, Quaternion.Euler(0, yRotation, 0));
+       }
+        
     }
 }
     bool IsRoad(int x, int z)
@@ -156,11 +156,11 @@ public class CityGenerator : MonoBehaviour
         if (prefabs.Length == 0) return;
         Instantiate(prefabs[Random.Range(0, prefabs.Length)], pos, rot, transform);
     }
-    void SpawnProp(GameObject[] prefabs, Vector3 position)
+    void SpawnProp(GameObject[] prefabs, Vector3 position, Quaternion rotation)
     {
         if (prefabs.Length == 0) return;
         GameObject prefab = prefabs[Random.Range(0, prefabs.Length)];
-        Instantiate(prefab, position, Quaternion.identity, transform);
+        Instantiate(prefab, position, rotation, transform);
     }
 
 }
