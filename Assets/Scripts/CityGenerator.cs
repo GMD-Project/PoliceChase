@@ -25,6 +25,7 @@ public class CityGenerator : MonoBehaviour
     [Header("Chances")]
     [Range(0f, 1f)] public float treeChance = 0.2f;
     [Range(0f, 1f)] public float propChance  = 0.15f;
+    
 
     bool[,] roadGrid;
 
@@ -32,43 +33,12 @@ public class CityGenerator : MonoBehaviour
 
 void GenerateCity()
 {
-    bool[,] isRoad = new bool[width, height];
-
-    List<int> colRoads = GenerateRoadLines(width);
-    List<int> rowRoads = GenerateRoadLines(height);
-
-   
-foreach (int col in colRoads)
-    foreach (int row in rowRoads)
-        isRoad[col, row] = true;
-
-
-foreach (int row in rowRoads)
-{
-    for (int i = 0; i < colRoads.Count - 1; i++)
-    {
-        if (Random.value < 0.2f) continue;
-        for (int x = colRoads[i]; x <= colRoads[i + 1]; x++)
-            isRoad[x, row] = true;
-    }
-}
-
-foreach (int col in colRoads)
-{
-    for (int j = 0; j < rowRoads.Count - 1; j++)
-    {
-        if (Random.value < 0.2f) continue;
-        for (int z = rowRoads[j]; z <= rowRoads[j + 1]; z++)
-            isRoad[col, z] = true;
-    }
-}
-
- EnsureRoadAccess(isRoad);
+    GenerateMaze();
     for (int x = 0; x < width; x++)
         for (int z = 0; z < height; z++)
         {
             Vector3 pos = new Vector3(x * tileSize, 0, z * tileSize);
-            if (isRoad[x, z]) SpawnRoad(isRoad, x, z, pos);
+            if (roadGrid[x, z]) SpawnRoad(roadGrid, x, z, pos);
             else SpawnRandomBuilding(pos);
         }
       
@@ -103,7 +73,7 @@ void EnsureRoadAccess(bool[,] isRoad)
             for (int startZ = 0; startZ < height; startZ++)
             {
                 if (isRoad[startX, startZ] || visited[startX, startZ]) continue;
-// Flood fill to find the full building cluster
+
                 List<Vector2Int> cluster = new List<Vector2Int>();
                 Queue<Vector2Int> queue = new Queue<Vector2Int>();
                 queue.Enqueue(new Vector2Int(startX, startZ));
@@ -325,6 +295,59 @@ void FixIsolatedAreas(bool[,] isRoad)
         if (prefabs.Length == 0) return;
         GameObject prefab = prefabs[Random.Range(0, prefabs.Length)];
         Instantiate(prefab, position, rotation, transform);
+    }
+        void GenerateMaze()
+    {
+        roadGrid = new bool[width, height];
+
+        int cellCols = width / 2;
+        int cellRows = height / 2;
+        bool[,] visited = new bool[cellCols, cellRows];
+
+        System.Collections.Generic.Stack<Vector2Int> stack = new System.Collections.Generic.Stack<Vector2Int>();
+        Vector2Int start = new Vector2Int(0, 0);
+        visited[start.x, start.y] = true;
+        stack.Push(start);
+
+        while (stack.Count > 0)
+        {
+            Vector2Int current = stack.Peek();
+
+            System.Collections.Generic.List<Vector2Int> neighbours = new System.Collections.Generic.List<Vector2Int>();
+            Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            foreach (var dir in dirs)
+            {
+                Vector2Int neighbour = current + dir;
+                if (neighbour.x >= 0 && neighbour.x < cellCols &&
+                    neighbour.y >= 0 && neighbour.y < cellRows &&
+                    !visited[neighbour.x, neighbour.y])
+                {
+                    neighbours.Add(neighbour);
+                }
+            }
+
+            if (neighbours.Count > 0)
+            {
+                Vector2Int next = neighbours[Random.Range(0, neighbours.Count)];
+                visited[next.x, next.y] = true;
+
+                int wallX = current.x * 2 + 1 + (next.x - current.x);
+                int wallZ = current.y * 2 + 1 + (next.y - current.y);
+                roadGrid[wallX, wallZ] = true;
+
+                roadGrid[next.x * 2 + 1, next.y * 2 + 1] = true;
+
+                stack.Push(next);
+            }
+            else
+            {
+                stack.Pop();
+            }
+        }
+
+        roadGrid[1, 1] = true;
+
+        roadGrid[1, 0] = true;
     }
 
     
