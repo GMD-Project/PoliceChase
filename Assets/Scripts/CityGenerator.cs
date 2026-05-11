@@ -6,6 +6,8 @@ public class CityGenerator : MonoBehaviour
     public int width = 200;
     public int height = 500;
     public float tileSize = 10f;
+    [Header("Player")]
+    public GameObject playerCarPrefab;
 
     [Header("Road Prefabs by Type")]
     public GameObject[] straightPrefabs;
@@ -28,6 +30,8 @@ public class CityGenerator : MonoBehaviour
 
 
     bool[,] roadGrid;
+    Vector2Int exitTile;
+
 
     void Start() => GenerateCity();
 
@@ -375,9 +379,51 @@ public class CityGenerator : MonoBehaviour
         {
             Vector2Int exit = exits[Random.Range(0, exits.Count)];
             roadGrid[exit.x, exit.y] = true;
+            exitTile = exit;
         }
+        SpawnPlayer();
     }
+    void SpawnPlayer()
+    {
+        if (playerCarPrefab == null) return;
 
+        List<Vector2Int> candidates = new List<Vector2Int>();
 
+        for (int x = 1; x < width - 1; x++)
+        {
+            for (int z = 1; z < height - 1; z++)
+            {
+                if (!roadGrid[x, z]) continue;
 
+                int neighbours = 0;
+                if (roadGrid[x + 1, z]) neighbours++;
+                if (roadGrid[x - 1, z]) neighbours++;
+                if (roadGrid[x, z + 1]) neighbours++;
+                if (roadGrid[x, z - 1]) neighbours++;
+
+                if (neighbours >= 2)
+                    candidates.Add(new Vector2Int(x, z));
+            }
+        }
+
+        if (candidates.Count == 0) return;
+
+        Vector2Int tile = candidates[Random.Range(0, candidates.Count)];
+
+        Vector3 spawnPos = transform.position + new Vector3(
+            tile.x * tileSize,
+            2.5f,
+            tile.y * tileSize
+        );
+
+        Quaternion spawnRot = Quaternion.identity;
+
+        if (roadGrid[tile.x, tile.y + 1]) spawnRot = Quaternion.Euler(0f, 0f, 0f);
+        else if (roadGrid[tile.x + 1, tile.y]) spawnRot = Quaternion.Euler(0f, 90f, 0f);
+        else if (roadGrid[tile.x, tile.y - 1]) spawnRot = Quaternion.Euler(0f, 180f, 0f);
+        else if (roadGrid[tile.x - 1, tile.y]) spawnRot = Quaternion.Euler(0f, 270f, 0f);
+
+        GameObject player = Instantiate(playerCarPrefab, spawnPos, spawnRot);
+        player.name = "PlayerCar";
+    }
 }
