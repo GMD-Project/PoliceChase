@@ -45,10 +45,6 @@ public class CityGenerator : MonoBehaviour
                 if (roadGrid[x, z]) SpawnRoad(roadGrid, x, z, pos);
                 else SpawnRandomBuilding(pos);
             }
-        GameObject ground = new GameObject("GroundCollider");
-        ground.transform.position = new Vector3((width * tileSize) / 2f, -0.5f, (height * tileSize) / 2f);
-        BoxCollider groundCol = ground.AddComponent<BoxCollider>();
-        groundCol.size = new Vector3(width * tileSize, 1f, height * tileSize);
         SpawnPlayer();
     }
 
@@ -233,7 +229,7 @@ public class CityGenerator : MonoBehaviour
             roadGrid[exit.x, exit.y] = true;
             exitTile = exit;
         }
-        
+
     }
     void SpawnPlayer()
     {
@@ -264,7 +260,7 @@ public class CityGenerator : MonoBehaviour
 
         Vector3 spawnPos = transform.position + new Vector3(
             tile.x * tileSize,
-            10f,
+            0.2f,
             tile.y * tileSize
         );
 
