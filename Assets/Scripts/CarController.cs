@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,29 +10,31 @@ public class CarController : MonoBehaviour
 
     Rigidbody rb;
     private PlayerInputActions input;
-    private Vector2 moveInput;
+    private Vector2 moveInputP1;
+    private Vector2 moveInputP2;
 
 
     void Awake()
     {
-        if (!isPlayer2)
-            input = new PlayerInputActions();
+        input = new PlayerInputActions();
     }
 
-    void OnEnable() {
-       if (!isPlayer2) 
-             input.Player.Enable();}
+    void OnEnable()
+    {
+        if (isPlayer2) input.Player2.Enable();
+        else input.Player.Enable();
+    }
+
     void OnDisable()
     {
-        if (!isPlayer2)
-            input.Player.Disable();
-
+        if (isPlayer2) input.Player2.Disable();
+        else input.Player.Disable();
     }
     void Start()
     {
         rb = GetComponentInParent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezePositionY 
-                   | RigidbodyConstraints.FreezeRotationX 
+        rb.constraints = RigidbodyConstraints.FreezePositionY
+                   | RigidbodyConstraints.FreezeRotationX
                    | RigidbodyConstraints.FreezeRotationZ;
     }
 
@@ -40,20 +43,18 @@ public class CarController : MonoBehaviour
     {
         if (isPlayer2)
         {
-            var kb = Keyboard.current;
-            float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
-            float y = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
-            moveInput = new Vector2(x, y);
+            moveInputP2 = input.Player2.Move.ReadValue<Vector2>();
         }
         else
         {
-            moveInput = input.Player.Move.ReadValue<Vector2>();
+            moveInputP1 = input.Player.Move.ReadValue<Vector2>();
         }
-      
+
     }
 
     void FixedUpdate()
     {
+        Vector2 moveInput = isPlayer2 ? moveInputP2 : moveInputP1;
         float move = moveInput.y;
         float turn = moveInput.x;
 
@@ -62,6 +63,6 @@ public class CarController : MonoBehaviour
         if (Mathf.Abs(move) > 0.01f)
             rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turn * turnSpeed * Time.fixedDeltaTime * move, 0));
         else
-            rb.angularVelocity = Vector3.zero; 
+            rb.angularVelocity = Vector3.zero;
     }
 }

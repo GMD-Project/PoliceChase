@@ -411,6 +411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarController
   speed: 15
   turnSpeed: 150
+  isPlayer2: 0
 --- !u!1 &3263149667454813771
 GameObject:
   m_ObjectHideFlags: 0
