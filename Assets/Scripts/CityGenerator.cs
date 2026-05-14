@@ -8,6 +8,7 @@ public class CityGenerator : MonoBehaviour
     public float tileSize = 10f;
     [Header("Player")]
     public GameObject playerCarPrefab;
+    public GameObject player2Prefab;
 
     [Header("Road Prefabs by Type")]
     public GameObject[] straightPrefabs;
@@ -31,6 +32,8 @@ public class CityGenerator : MonoBehaviour
 
     bool[,] roadGrid;
     Vector2Int exitTile;
+    private Vector2Int _player1Tile;
+    private Vector2Int _player1ForwardDir;
 
 
     void Start() => GenerateCity();
@@ -266,15 +269,72 @@ public class CityGenerator : MonoBehaviour
 
         Quaternion spawnRot = Quaternion.identity;
 
-        if (roadGrid[tile.x, tile.y + 1]) spawnRot = Quaternion.Euler(0f, 0f, 0f);
-        else if (roadGrid[tile.x + 1, tile.y]) spawnRot = Quaternion.Euler(0f, 90f, 0f);
-        else if (roadGrid[tile.x, tile.y - 1]) spawnRot = Quaternion.Euler(0f, 180f, 0f);
-        else if (roadGrid[tile.x - 1, tile.y]) spawnRot = Quaternion.Euler(0f, 270f, 0f);
+        _player1Tile = tile;
+        _player1Tile = tile;
+        if (roadGrid[tile.x, tile.y + 1])      { spawnRot = Quaternion.Euler(0f,   0f, 0f); _player1ForwardDir = new Vector2Int( 0,  1); }
+        else if (roadGrid[tile.x + 1, tile.y]) { spawnRot = Quaternion.Euler(0f,  90f, 0f); _player1ForwardDir = new Vector2Int( 1,  0); }
+        else if (roadGrid[tile.x, tile.y - 1]) { spawnRot = Quaternion.Euler(0f, 180f, 0f); _player1ForwardDir = new Vector2Int( 0, -1); }
+        else if (roadGrid[tile.x - 1, tile.y]) { spawnRot = Quaternion.Euler(0f, 270f, 0f); _player1ForwardDir = new Vector2Int(-1,  0); }
+
+
 
         GameObject player = Instantiate(playerCarPrefab, spawnPos, spawnRot);
         player.name = "PlayerCar";
 
         TopDownCamera cam = Camera.main.GetComponent<TopDownCamera>();
         if (cam != null) cam.target = player.transform;
+
+        SpawnPlayer2();
+
+
+    }
+
+        void SpawnPlayer2()
+    {
+        if (player2Prefab == null) return;
+
+        Vector2Int tile = _player1Tile;
+        Vector2Int dir = -_player1ForwardDir;
+        Vector2Int cameFrom = _player1Tile + _player1ForwardDir;
+
+        for (int i = 0; i < 9; i++)
+        {
+            Vector2Int next = tile + dir;
+            if (IsRoad(next.x, next.y))
+            {
+                cameFrom = tile;
+                tile = next;
+            }
+            else
+            {
+                Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+                bool moved = false;
+                foreach (var d in dirs)
+                {
+                    Vector2Int candidate = tile + d;
+                    if (candidate != cameFrom && IsRoad(candidate.x, candidate.y))
+                    {
+                        dir = d;
+                        cameFrom = tile;
+                        tile = candidate;
+                        moved = true;
+                        break;
+                    }
+                }
+                if (!moved) break;
+            }
+        }
+
+        Vector3 spawnPos = transform.position + new Vector3(tile.x * tileSize, 0.2f, tile.y * tileSize);
+
+        Vector2Int facing = -dir;
+        Quaternion spawnRot;
+        if      (facing == new Vector2Int(0,  1)) spawnRot = Quaternion.Euler(0f,   0f, 0f);
+        else if (facing == new Vector2Int(1,  0)) spawnRot = Quaternion.Euler(0f,  90f, 0f);
+        else if (facing == new Vector2Int(0, -1)) spawnRot = Quaternion.Euler(0f, 180f, 0f);
+        else                                      spawnRot = Quaternion.Euler(0f, 270f, 0f);
+
+        GameObject player2 = Instantiate(player2Prefab, spawnPos, spawnRot);
+        player2.name = "Player2Car";
     }
 }
