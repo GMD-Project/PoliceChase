@@ -138,6 +138,11 @@ public class CityGenerator : MonoBehaviour
         if (buildingPrefabs.Length == 0) return;
         Quaternion rot = Quaternion.Euler(0, Random.Range(0, 4) * 90f, 0);
         Instantiate(buildingPrefabs[Random.Range(0, buildingPrefabs.Length)], pos, rot, transform);
+        GameObject blocker = new GameObject("TileBlocker");
+        blocker.transform.position = pos + new Vector3(0, 2.5f, 0);
+        blocker.transform.parent = transform;
+        BoxCollider col = blocker.AddComponent<BoxCollider>();
+        col.size = new Vector3(tileSize, 5f, tileSize);
     }
 
     void SpawnRandom(GameObject[] prefabs, Vector3 pos, Quaternion rot)

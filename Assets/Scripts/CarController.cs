@@ -37,7 +37,11 @@ public class CarController : MonoBehaviour
         float move = moveInput.y;
         float turn = moveInput.x;
 
-        rb.MovePosition(rb.position + transform.forward * move * speed * Time.fixedDeltaTime);
-        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turn * turnSpeed * Time.fixedDeltaTime * move, 0));
+        rb.linearVelocity = transform.forward * move * speed;
+
+        if (Mathf.Abs(move) > 0.01f)
+            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turn * turnSpeed * Time.fixedDeltaTime * move, 0));
+        else
+            rb.angularVelocity = Vector3.zero; 
     }
 }
