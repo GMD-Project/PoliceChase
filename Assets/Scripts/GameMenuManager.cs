@@ -18,6 +18,7 @@ public class GameMenuManager : MonoBehaviour
     [Header("Main Menu Buttons")]
     public GameObject startButtonObject;
     public GameObject mainExitButtonObject;
+    public GameObject backButtonObject;
 
     [Header("Optional")]
     public string menuSceneName = "";
@@ -37,7 +38,7 @@ public class GameMenuManager : MonoBehaviour
         if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(true);
 
         if (startButtonObject != null) startButtonObject.SetActive(false);
-        if (mainExitButtonObject != null) mainExitButtonObject.SetActive(false);
+        if (mainExitButtonObject != null) mainExitButtonObject.SetActive(true);
     }
 
     public void SelectSinglePlayer()
@@ -120,8 +121,21 @@ public class GameMenuManager : MonoBehaviour
     {
         if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(false);
         if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(false);
-
+        if (mainExitButtonObject != null) mainExitButtonObject.SetActive(false);
         if (startButtonObject != null) startButtonObject.SetActive(true);
+        if (backButtonObject != null) backButtonObject.SetActive(true);
+    }
+
+    public void GoBack()
+    {
+        modeSelected = false;
+        selectedMode = "";
+
+        if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(true);
+        if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(true);
         if (mainExitButtonObject != null) mainExitButtonObject.SetActive(true);
+
+        if (startButtonObject != null) startButtonObject.SetActive(false);
+        if (backButtonObject != null) backButtonObject.SetActive(false);
     }
 }
