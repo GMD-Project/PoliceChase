@@ -36,7 +36,11 @@ public class CityGenerator : MonoBehaviour
     private Vector2Int _player1ForwardDir;
 
 
-    void Start() => GenerateCity();
+    public void StartGame()
+    {
+        Debug.Log("CityGenerator.StartGame called");
+        GenerateCity();
+    }
 
     void GenerateCity()
     {
@@ -276,10 +280,10 @@ public class CityGenerator : MonoBehaviour
 
         _player1Tile = tile;
         _player1Tile = tile;
-        if (roadGrid[tile.x, tile.y + 1])      { spawnRot = Quaternion.Euler(0f,   0f, 0f); _player1ForwardDir = new Vector2Int( 0,  1); }
-        else if (roadGrid[tile.x + 1, tile.y]) { spawnRot = Quaternion.Euler(0f,  90f, 0f); _player1ForwardDir = new Vector2Int( 1,  0); }
-        else if (roadGrid[tile.x, tile.y - 1]) { spawnRot = Quaternion.Euler(0f, 180f, 0f); _player1ForwardDir = new Vector2Int( 0, -1); }
-        else if (roadGrid[tile.x - 1, tile.y]) { spawnRot = Quaternion.Euler(0f, 270f, 0f); _player1ForwardDir = new Vector2Int(-1,  0); }
+        if (roadGrid[tile.x, tile.y + 1]) { spawnRot = Quaternion.Euler(0f, 0f, 0f); _player1ForwardDir = new Vector2Int(0, 1); }
+        else if (roadGrid[tile.x + 1, tile.y]) { spawnRot = Quaternion.Euler(0f, 90f, 0f); _player1ForwardDir = new Vector2Int(1, 0); }
+        else if (roadGrid[tile.x, tile.y - 1]) { spawnRot = Quaternion.Euler(0f, 180f, 0f); _player1ForwardDir = new Vector2Int(0, -1); }
+        else if (roadGrid[tile.x - 1, tile.y]) { spawnRot = Quaternion.Euler(0f, 270f, 0f); _player1ForwardDir = new Vector2Int(-1, 0); }
 
 
 
@@ -294,7 +298,7 @@ public class CityGenerator : MonoBehaviour
 
     }
 
-        void SpawnPlayer2()
+    void SpawnPlayer2()
     {
         if (player2Prefab == null) return;
 
@@ -334,10 +338,10 @@ public class CityGenerator : MonoBehaviour
 
         Vector2Int facing = -dir;
         Quaternion spawnRot;
-        if      (facing == new Vector2Int(0,  1)) spawnRot = Quaternion.Euler(0f,   0f, 0f);
-        else if (facing == new Vector2Int(1,  0)) spawnRot = Quaternion.Euler(0f,  90f, 0f);
+        if (facing == new Vector2Int(0, 1)) spawnRot = Quaternion.Euler(0f, 0f, 0f);
+        else if (facing == new Vector2Int(1, 0)) spawnRot = Quaternion.Euler(0f, 90f, 0f);
         else if (facing == new Vector2Int(0, -1)) spawnRot = Quaternion.Euler(0f, 180f, 0f);
-        else                                      spawnRot = Quaternion.Euler(0f, 270f, 0f);
+        else spawnRot = Quaternion.Euler(0f, 270f, 0f);
 
         GameObject player2 = Instantiate(player2Prefab, spawnPos, spawnRot);
         player2.name = "Player2Car";
