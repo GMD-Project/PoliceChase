@@ -17,7 +17,8 @@ public class TopDownCamera : MonoBehaviour
         if (target == null) return;
         Vector3 desired = new Vector3(target.position.x, target.position.y + height, target.position.z);
         transform.position = Vector3.Lerp(transform.position, desired, smoothSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        Quaternion targetRot = Quaternion.Euler(90f, target.eulerAngles.y, 0f);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, smoothSpeed * Time.deltaTime);
     }
     
 }

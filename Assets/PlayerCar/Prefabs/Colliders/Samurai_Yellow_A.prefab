@@ -329,6 +329,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2048616764513898630}
   - component: {fileID: -511929251134074352}
+  - component: {fileID: 2906466375943748263}
+  - component: {fileID: 7187350532561676679}
   m_Layer: 0
   m_Name: Samurai_Yellow_A
   m_TagString: Untagged
@@ -380,6 +382,35 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!114 &2906466375943748263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3225874551983908691}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b0f8790e30988840ae357b859a2fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownCamera
+  target: {fileID: 0}
+  height: 50
+  smoothSpeed: 5
+--- !u!114 &7187350532561676679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3225874551983908691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7d51f50e4df984db0c0dc210edab1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CarController
+  speed: 15
+  turnSpeed: 150
 --- !u!1 &3263149667454813771
 GameObject:
   m_ObjectHideFlags: 0

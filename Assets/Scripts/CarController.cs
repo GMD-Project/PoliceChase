@@ -1,11 +1,23 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
 {
     public float speed = 15f;
-    public float turnSpeed = 90f;
+    public float turnSpeed = 150f;
 
     Rigidbody rb;
+    private PlayerInputActions input;
+    private Vector2 moveInput;
+
+
+     void Awake()
+    {
+        input = new PlayerInputActions();
+    }
+
+    void OnEnable() => input.Player.Enable();
+    void OnDisable() => input.Player.Disable();
 
     void Start()
     {
@@ -15,10 +27,15 @@ public class CarController : MonoBehaviour
                    | RigidbodyConstraints.FreezeRotationZ;
     }
 
+    void Update()
+    {
+        moveInput = input.Player.Move.ReadValue<Vector2>();
+    }
+
     void FixedUpdate()
     {
-        float move = Input.GetAxis("Vertical");
-        float turn = Input.GetAxis("Horizontal");
+        float move = moveInput.y;
+        float turn = moveInput.x;
 
         rb.MovePosition(rb.position + transform.forward * move * speed * Time.fixedDeltaTime);
         rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turn * turnSpeed * Time.fixedDeltaTime * move, 0));

@@ -544,7 +544,8 @@ MonoBehaviour:
   width: 50
   height: 50
   tileSize: 10
-  playerCarPrefab: {fileID: 9006012159704278945, guid: 170583311658d5e4ca8485d88e85cb0b, type: 3}
+  playerCarPrefab: {fileID: 3225874551983908691, guid: 5c2dae08a90c27b4fb04d401da666b6b, type: 3}
+  player2Prefab: {fileID: 1829922410192357324, guid: ad0f80dc67ce9684b8972b2f04854d93, type: 3}
   straightPrefabs:
   - {fileID: 8238353210620473497, guid: 7dd5d8d728c6ce345b1ce9796588b843, type: 3}
   - {fileID: 4412122052823812425, guid: 7192bd53105203e40943cfe63c601702, type: 3}
