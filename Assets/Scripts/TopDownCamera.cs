@@ -8,6 +8,7 @@ public class TopDownCamera : MonoBehaviour
 
     void Start()
     {
+        if (target != null) return;
         CarController car = FindObjectOfType<CarController>();
         if (car != null) target = car.transform;
     }
@@ -20,6 +21,6 @@ public class TopDownCamera : MonoBehaviour
         Quaternion targetRot = Quaternion.Euler(90f, target.eulerAngles.y, 0f);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, smoothSpeed * Time.deltaTime);
     }
-    
+
 }
 

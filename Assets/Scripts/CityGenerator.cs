@@ -30,6 +30,9 @@ public class CityGenerator : MonoBehaviour
     [Range(0f, 1f)] public float propChance = 0.15f;
 
 
+    [Header("Game Mode")]
+    public string gameMode = "Single Player";
+
     bool[,] roadGrid;
     Vector2Int exitTile;
     private Vector2Int _player1Tile;
@@ -279,7 +282,6 @@ public class CityGenerator : MonoBehaviour
         Quaternion spawnRot = Quaternion.identity;
 
         _player1Tile = tile;
-        _player1Tile = tile;
         if (roadGrid[tile.x, tile.y + 1]) { spawnRot = Quaternion.Euler(0f, 0f, 0f); _player1ForwardDir = new Vector2Int(0, 1); }
         else if (roadGrid[tile.x + 1, tile.y]) { spawnRot = Quaternion.Euler(0f, 90f, 0f); _player1ForwardDir = new Vector2Int(1, 0); }
         else if (roadGrid[tile.x, tile.y - 1]) { spawnRot = Quaternion.Euler(0f, 180f, 0f); _player1ForwardDir = new Vector2Int(0, -1); }
@@ -290,8 +292,15 @@ public class CityGenerator : MonoBehaviour
         GameObject player = Instantiate(playerCarPrefab, spawnPos, spawnRot);
         player.name = "PlayerCar";
 
-        TopDownCamera cam = Camera.main.GetComponent<TopDownCamera>();
-        if (cam != null) cam.target = player.transform;
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            if (gameMode == "Multiplayer")
+                mainCam.rect = new Rect(0f, 0f, 0.5f, 1f);
+
+            TopDownCamera cam = mainCam.GetComponent<TopDownCamera>();
+            if (cam != null) cam.target = player.transform;
+        }
 
         SpawnPlayer2();
 
@@ -345,5 +354,18 @@ public class CityGenerator : MonoBehaviour
 
         GameObject player2 = Instantiate(player2Prefab, spawnPos, spawnRot);
         player2.name = "Player2Car";
+
+        if (gameMode == "Multiplayer")
+        {
+            CarController controller = player2.GetComponentInChildren<CarController>();
+            if (controller != null)
+                controller.isPlayer2 = true;
+
+            GameObject cam2Obj = new GameObject("Player2Camera");
+            Camera cam2 = cam2Obj.AddComponent<Camera>();
+            cam2.rect = new Rect(0.5f, 0f, 0.5f, 1f);
+            TopDownCamera follow = cam2Obj.AddComponent<TopDownCamera>();
+            follow.target = player2.transform;
+        }
     }
 }

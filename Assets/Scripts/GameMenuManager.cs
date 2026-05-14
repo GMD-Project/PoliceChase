@@ -73,6 +73,7 @@ public class GameMenuManager : MonoBehaviour
             return;
         }
 
+        cityGenerator.gameMode = selectedMode;
         cityGenerator.StartGame();
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
