@@ -1832,6 +1832,7 @@ MonoBehaviour:
   signChance: 0.3
   treeChance: 0.2
   propChance: 0.15
+  gameMode: Single Player
 --- !u!4 &1476910809
 Transform:
   m_ObjectHideFlags: 0
@@ -2237,7 +2238,7 @@ MonoBehaviour:
   multiplayerButtonObject: {fileID: 543494287}
   startButtonObject: {fileID: 748450991}
   mainExitButtonObject: {fileID: 2092713776}
-  backButtonObject: {fileID: 0}
+  backButtonObject: {fileID: 129374595}
   menuSceneName: 
 --- !u!4 &1959299134
 Transform:

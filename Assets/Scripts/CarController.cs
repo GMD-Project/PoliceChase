@@ -60,9 +60,15 @@ public class CarController : MonoBehaviour
 
         rb.linearVelocity = transform.forward * move * speed;
 
-        if (Mathf.Abs(move) > 0.01f)
-            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turn * turnSpeed * Time.fixedDeltaTime * move, 0));
+        if (Mathf.Abs(turn) > 0.01f)
+        {
+            rb.MoveRotation(
+                rb.rotation * Quaternion.Euler(0f, turn * turnSpeed * Time.fixedDeltaTime, 0f)
+            );
+        }
         else
+        {
             rb.angularVelocity = Vector3.zero;
+        }
     }
 }

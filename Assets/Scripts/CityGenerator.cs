@@ -37,6 +37,7 @@ public class CityGenerator : MonoBehaviour
     Vector2Int exitTile;
     private Vector2Int _player1Tile;
     private Vector2Int _player1ForwardDir;
+    private Transform _player1Transform;
 
 
     public void StartGame()
@@ -291,12 +292,15 @@ public class CityGenerator : MonoBehaviour
 
         GameObject player = Instantiate(playerCarPrefab, spawnPos, spawnRot);
         player.name = "PlayerCar";
+        _player1Transform = player.transform;
 
         Camera mainCam = Camera.main;
         if (mainCam != null)
         {
             if (gameMode == "Multiplayer")
                 mainCam.rect = new Rect(0f, 0f, 0.5f, 1f);
+            else
+                mainCam.rect = new Rect(0f, 0f, 1f, 1f);
 
             TopDownCamera cam = mainCam.GetComponent<TopDownCamera>();
             if (cam != null) cam.target = player.transform;
@@ -353,19 +357,39 @@ public class CityGenerator : MonoBehaviour
         else spawnRot = Quaternion.Euler(0f, 270f, 0f);
 
         GameObject player2 = Instantiate(player2Prefab, spawnPos, spawnRot);
-        player2.name = "Player2Car";
+        player2.name = gameMode == "Multiplayer" ? "Player2Car" : "PoliceCar";
+        
+        CarController controller = player2.GetComponentInChildren<CarController>();
+        PoliceAIController ai = player2.GetComponent<PoliceAIController>();
 
         if (gameMode == "Multiplayer")
         {
-            CarController controller = player2.GetComponentInChildren<CarController>();
             if (controller != null)
+            {
+                controller.enabled = true;
                 controller.isPlayer2 = true;
+            }
+
+            if (ai != null)
+                ai.enabled = false;
 
             GameObject cam2Obj = new GameObject("Player2Camera");
             Camera cam2 = cam2Obj.AddComponent<Camera>();
             cam2.rect = new Rect(0.5f, 0f, 0.5f, 1f);
+
             TopDownCamera follow = cam2Obj.AddComponent<TopDownCamera>();
             follow.target = player2.transform;
+        }
+        else
+        {
+            if (controller != null)
+                controller.enabled = false;
+
+            if (ai == null)
+                ai = player2.AddComponent<PoliceAIController>();
+
+            ai.enabled = true;
+            ai.target = _player1Transform;
         }
     }
 }
