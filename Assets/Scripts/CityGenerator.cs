@@ -43,6 +43,7 @@ public class CityGenerator : MonoBehaviour
     public void StartGame()
     {
         Debug.Log("CityGenerator.StartGame called");
+        ClearCity();
         GenerateCity();
     }
 
@@ -358,7 +359,7 @@ public class CityGenerator : MonoBehaviour
 
         GameObject player2 = Instantiate(player2Prefab, spawnPos, spawnRot);
         player2.name = gameMode == "Multiplayer" ? "Player2Car" : "PoliceCar";
-        
+
         CarController controller = player2.GetComponentInChildren<CarController>();
         PoliceAIController ai = player2.GetComponent<PoliceAIController>();
 
@@ -391,5 +392,24 @@ public class CityGenerator : MonoBehaviour
             ai.enabled = true;
             ai.target = _player1Transform;
         }
+    }
+    public void ClearCity()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(transform.GetChild(i).gameObject);
+        }
+
+        GameObject player = GameObject.Find("PlayerCar");
+        if (player != null) Destroy(player);
+
+        GameObject player2 = GameObject.Find("Player2Car");
+        if (player2 != null) Destroy(player2);
+
+        GameObject police = GameObject.Find("PoliceCar");
+        if (police != null) Destroy(police);
+
+        GameObject player2Camera = GameObject.Find("Player2Camera");
+        if (player2Camera != null) Destroy(player2Camera);
     }
 }

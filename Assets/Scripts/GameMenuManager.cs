@@ -280,6 +280,10 @@ public class GameMenuManager : MonoBehaviour
     public void ExitToMainMenu()
     {
         Time.timeScale = 1f;
+
+        if (cityGenerator != null)
+            cityGenerator.ClearCity();
+
         ShowInitialMenu();
     }
 }
