@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 public class CityGenerator : MonoBehaviour
 {
     [Header("City Size")]
@@ -29,6 +30,9 @@ public class CityGenerator : MonoBehaviour
     [Range(0f, 1f)] public float treeChance = 0.2f;
     [Range(0f, 1f)] public float propChance = 0.15f;
 
+    [Header("Navigation")]
+    public NavMeshSurface navMeshSurface;
+
 
     [Header("Game Mode")]
     public string gameMode = "Single Player";
@@ -57,6 +61,17 @@ public class CityGenerator : MonoBehaviour
                 if (roadGrid[x, z]) SpawnRoad(roadGrid, x, z, pos);
                 else SpawnRandomBuilding(pos);
             }
+        if (navMeshSurface != null)
+        {
+            GameObject ground = new GameObject("NavMeshGround");
+            ground.layer = LayerMask.NameToLayer("NavMeshObstacle");
+            BoxCollider groundCol = ground.AddComponent<BoxCollider>();
+            groundCol.center = new Vector3((width * tileSize) / 2f, -0.1f, (height * tileSize) / 2f);
+            groundCol.size = new Vector3(width * tileSize, 0.2f, height * tileSize);
+            navMeshSurface.BuildNavMesh();
+
+        }
+            
         SpawnPlayer();
     }
 
@@ -151,6 +166,7 @@ public class CityGenerator : MonoBehaviour
         blocker.transform.position = pos + new Vector3(0, 2.5f, 0);
         blocker.transform.parent = transform;
         BoxCollider col = blocker.AddComponent<BoxCollider>();
+        blocker.layer = LayerMask.NameToLayer("NavMeshObstacle");
         col.size = new Vector3(tileSize, 5f, tileSize);
     }
 

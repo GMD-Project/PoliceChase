@@ -1,61 +1,37 @@
 // File: Assets/Scripts/PoliceAIController.cs
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PoliceAIController : MonoBehaviour
 {
     [Header("Target")]
     public Transform target;
 
-    [Header("Forward Chase")]
-    public float forwardSpeed = 20f;
+    [Header("Chase")]
+    public float forwardSpeed = 15f;
     public float turnSpeed = 220f;
-    public float predictionTime = 0.9f;
-    public float nearTargetRadius = 7f;
+    public float minSpeedFactor = 0.4f;
+    public float pathLookahead = 15f;
+    public float reverseSpeed = 8f;
 
-    [Header("Reverse Recovery")]
-    public float reverseSpeed = 12f;
-    public float reverseTurnSpeedMultiplier = 1.4f;
-    public float reverseDuration = 1.4f;
-    public float turnInPlaceDuration = 0.5f;
-
-    [Header("Stuck Detection")]
-    public float stuckSpeedThreshold = 1.2f;
-    public float stuckTime = 0.7f;
-
-    [Header("Obstacle Avoidance")]
-    public float sensorLength = 10f;
-    public float sideSensorAngle = 30f;
-    public float sensorSideOffset = 1.2f;
-    public float avoidanceWeight = 1.5f;
-    public LayerMask obstacleMask = ~0;
+    [Header("Stuck Recovery")]
+    public float stuckSpeedThreshold = 0.5f;
+    public float stuckTime = 1.5f;
+    public float recoveryDuration = 0.8f;
 
     private Rigidbody rb;
     private Transform carTransform;
-    private Rigidbody targetRb;
+    private NavMeshAgent agent;
 
     private float stuckTimer;
     private float recoveryTimer;
-    private float recoveryTurnDirection;
-
-    private enum AiState
-    {
-        Chase,
-        ReverseRecover,
-        TurnInPlaceRecover
-    }
-
-    private AiState state = AiState.Chase;
+    private bool isRecovering;
 
     void Start()
     {
         rb = GetComponentInParent<Rigidbody>();
 
-        if (rb == null)
-        {
-            Debug.LogError("PoliceAIController needs a Rigidbody on this object or its parent.");
-            enabled = false;
-            return;
-        }
+        if (rb == null) { enabled = false; return; }
 
         carTransform = rb.transform;
 
@@ -63,92 +39,55 @@ public class PoliceAIController : MonoBehaviour
                        | RigidbodyConstraints.FreezeRotationX
                        | RigidbodyConstraints.FreezeRotationZ;
 
-        if (target != null)
-            targetRb = target.GetComponentInParent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+        }   
     }
 
     void FixedUpdate()
     {
-        if (rb == null || target == null) return;
+        if (rb == null || target == null|| agent == null) return;
 
-        if (targetRb == null)
-            targetRb = target.GetComponentInParent<Rigidbody>();
+       agent.SetDestination(target.position);
+        agent.nextPosition = carTransform.position;
 
-        switch (state)
+        if (isRecovering)
         {
-            case AiState.Chase:
-                HandleChase();
-                break;
-
-            case AiState.ReverseRecover:
-                HandleReverseRecover();
-                break;
-
-            case AiState.TurnInPlaceRecover:
-                HandleTurnInPlaceRecover();
-                break;
+            HandleRecovery();
+            return;
         }
+
+        HandleChase();
     }
 
     void HandleChase()
     {
         Vector3 chasePoint = GetChasePoint();
-        float pursuitSteer = GetPursuitSteer(chasePoint);
-        float avoidSteer = GetAvoidanceSteer();
-        float finalSteer = Mathf.Clamp(pursuitSteer + avoidSteer, -1f, 1f);
+        float steer = GetSteer(chasePoint);
 
         rb.MoveRotation(
-            rb.rotation * Quaternion.Euler(0f, finalSteer * turnSpeed * Time.fixedDeltaTime, 0f)
+            rb.rotation * Quaternion.Euler(0f, steer * turnSpeed * Time.fixedDeltaTime, 0f)
         );
-
-        rb.linearVelocity = carTransform.forward * forwardSpeed;
-
+        float speedFactor = Mathf.Lerp(1f, minSpeedFactor, Mathf.Clamp01((Mathf.Abs(steer) - 0.3f) / 0.7f));
+        rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, carTransform.forward * forwardSpeed * speedFactor, 12f * Time.fixedDeltaTime);  
         CheckIfStuck();
     }
 
-    void HandleReverseRecover()
+    void HandleRecovery()
     {
         recoveryTimer -= Time.fixedDeltaTime;
-
-        rb.MoveRotation(
-            rb.rotation * Quaternion.Euler(
-                0f,
-                recoveryTurnDirection * turnSpeed * reverseTurnSpeedMultiplier * Time.fixedDeltaTime,
-                0f
-            )
-        );
-
         rb.linearVelocity = -carTransform.forward * reverseSpeed;
 
         if (recoveryTimer <= 0f)
         {
-            state = AiState.TurnInPlaceRecover;
-            recoveryTimer = turnInPlaceDuration;
-        }
-    }
-
-    void HandleTurnInPlaceRecover()
-    {
-        recoveryTimer -= Time.fixedDeltaTime;
-
-        rb.MoveRotation(
-            rb.rotation * Quaternion.Euler(
-                0f,
-                recoveryTurnDirection * turnSpeed * reverseTurnSpeedMultiplier * Time.fixedDeltaTime,
-                0f
-            )
-        );
-
-        rb.linearVelocity = Vector3.zero;
-
-        if (recoveryTimer <= 0f)
-        {
-            state = AiState.Chase;
+            isRecovering = false;
             stuckTimer = 0f;
-            rb.angularVelocity = Vector3.zero;
+            agent.ResetPath();
         }
     }
-
     void CheckIfStuck()
     {
         Vector3 flatVelocity = rb.linearVelocity;
@@ -159,7 +98,11 @@ public class PoliceAIController : MonoBehaviour
             stuckTimer += Time.fixedDeltaTime;
 
             if (stuckTimer >= stuckTime)
-                StartRecovery();
+            {
+                isRecovering = true;
+                recoveryTimer = recoveryDuration;
+                stuckTimer = 0f;
+            }
         }
         else
         {
@@ -167,79 +110,40 @@ public class PoliceAIController : MonoBehaviour
         }
     }
 
-    void StartRecovery()
-    {
-        state = AiState.ReverseRecover;
-        recoveryTimer = reverseDuration;
-        stuckTimer = 0f;
-        recoveryTurnDirection = Random.value < 0.5f ? -1f : 1f;
-    }
-
     Vector3 GetChasePoint()
     {
-        Vector3 targetPosition = target.position;
-        Vector3 targetVelocity = Vector3.zero;
-
-        if (targetRb != null)
+        if (!agent.hasPath)
         {
-            targetVelocity = targetRb.linearVelocity;
-            targetVelocity.y = 0f;
+            Vector3 fallback = target.position;
+            fallback.y = carTransform.position.y;
+            return fallback;
         }
 
-        Vector3 predicted = targetPosition + targetVelocity * predictionTime;
-        predicted.y = carTransform.position.y;
+        Vector3[] corners = agent.path.corners;
+        float remaining = pathLookahead;
+        Vector3 current = carTransform.position;
 
-        float distance = Vector3.Distance(
-            new Vector3(carTransform.position.x, 0f, carTransform.position.z),
-            new Vector3(targetPosition.x, 0f, targetPosition.z)
-        );
-
-        if (distance < nearTargetRadius)
+        for (int i = 0; i < corners.Length; i++)
         {
-            predicted = targetPosition + target.forward * 4f;
-            predicted.y = carTransform.position.y;
+            float segLen = Vector3.Distance(current, corners[i]);
+            if (segLen >= remaining)
+                return current + (corners[i] - current).normalized * remaining;
+
+            remaining -= segLen;
+            current = corners[i];
         }
 
-        return predicted;
+        Vector3 last = corners[corners.Length - 1];
+        last.y = carTransform.position.y;
+        return last;
     }
 
-    float GetPursuitSteer(Vector3 chasePoint)
+    float GetSteer(Vector3 chasePoint)
     {
         Vector3 toPoint = chasePoint - carTransform.position;
         toPoint.y = 0f;
-
         if (toPoint.sqrMagnitude < 0.01f) return 0f;
-
-        Vector3 desiredDirection = toPoint.normalized;
-        float angle = Vector3.SignedAngle(carTransform.forward, desiredDirection, Vector3.up);
-        return Mathf.Clamp(angle / 45f, -1f, 1f);
-    }
-
-    float GetAvoidanceSteer()
-    {
-        Vector3 originCenter = carTransform.position + carTransform.forward * 1.5f + Vector3.up * 0.5f;
-        Vector3 originLeft = originCenter - carTransform.right * sensorSideOffset;
-        Vector3 originRight = originCenter + carTransform.right * sensorSideOffset;
-
-        float steer = 0f;
-
-        if (Physics.Raycast(originCenter, carTransform.forward, out RaycastHit centerHit, sensorLength, obstacleMask, QueryTriggerInteraction.Ignore))
-        {
-            steer += Vector3.Dot(centerHit.normal, carTransform.right) >= 0f ? -1f : 1f;
-        }
-
-        Vector3 leftDir = Quaternion.AngleAxis(-sideSensorAngle, Vector3.up) * carTransform.forward;
-        if (Physics.Raycast(originLeft, leftDir, out _, sensorLength * 0.9f, obstacleMask, QueryTriggerInteraction.Ignore))
-        {
-            steer += 1f;
-        }
-
-        Vector3 rightDir = Quaternion.AngleAxis(sideSensorAngle, Vector3.up) * carTransform.forward;
-        if (Physics.Raycast(originRight, rightDir, out _, sensorLength * 0.9f, obstacleMask, QueryTriggerInteraction.Ignore))
-        {
-            steer -= 1f;
-        }
-
-        return Mathf.Clamp(steer * avoidanceWeight, -1f, 1f);
+        float angle = Vector3.SignedAngle(carTransform.forward, toPoint.normalized, Vector3.up);
+        return Mathf.Clamp(angle / 60f, -1f, 1f);
     }
 }
