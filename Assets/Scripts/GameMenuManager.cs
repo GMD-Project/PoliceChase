@@ -21,6 +21,10 @@ public class GameMenuManager : MonoBehaviour
     public GameObject mainExitButtonObject;
     public GameObject backButtonObject;
 
+    [Header("Pause Menu Buttons")]
+    public GameObject resumeButtonObject;
+    public GameObject exitToMenuButtonObject;
+
     [Header("Optional")]
     public string menuSceneName = "";
 
@@ -34,6 +38,9 @@ public class GameMenuManager : MonoBehaviour
 
     private bool modeSelected = false;
     private string selectedMode = "";
+    private bool gameStarted = false;
+    private bool isPaused = false;
+
 
     void Start()
     {
@@ -49,7 +56,7 @@ public class GameMenuManager : MonoBehaviour
         if (startButtonObject != null) startButtonObject.SetActive(false);
         if (mainExitButtonObject != null) mainExitButtonObject.SetActive(true);
 
-        currentIndex = 0;   
+        currentIndex = 0;
         UpdateHighlight(CurrentButtons());
     }
     private void OnNavigate(InputAction.CallbackContext ctx)
@@ -66,7 +73,11 @@ public class GameMenuManager : MonoBehaviour
     }
     private void OnSelect(InputAction.CallbackContext ctx)
     {
-        CurrentButtons()[currentIndex].GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+        GameObject[] buttons = CurrentButtons();
+        if (buttons.Length == 0) return;
+        if (buttons[currentIndex] == null) return;
+
+        buttons[currentIndex].GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
     }
 
     public void SelectSinglePlayer()
@@ -103,30 +114,44 @@ public class GameMenuManager : MonoBehaviour
 
         cityGenerator.gameMode = selectedMode;
         cityGenerator.StartGame();
+        gameStarted = true;
+        isPaused = false;
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
-        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(true);
+        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
 
         Time.timeScale = 1f;
     }
 
     public void PauseGame()
     {
+        if (!gameStarted) return;
+
+        isPaused = true;
         Time.timeScale = 0f;
-        if (confirmPanel != null) confirmPanel.SetActive(true);
+
+        if (confirmPanel != null)
+            confirmPanel.SetActive(true);
+
+        currentIndex = 0;
+        UpdateHighlight(CurrentButtons());
     }
 
-    public void OpenExitConfirm()
+    public void ResumeGame()
     {
-        Time.timeScale = 0f;
-        if (confirmPanel != null) confirmPanel.SetActive(true);
+        isPaused = false;
+        Time.timeScale = 1f;
+
+        if (confirmPanel != null)
+            confirmPanel.SetActive(false);
+
+        currentIndex = 0;
     }
 
     public void ContinueGame()
     {
-        Time.timeScale = 1f;
-        if (confirmPanel != null) confirmPanel.SetActive(false);
+        ResumeGame();
     }
 
     public void ExitGame()
@@ -159,6 +184,29 @@ public class GameMenuManager : MonoBehaviour
         UpdateHighlight(CurrentButtons());
     }
 
+
+    private void ShowInitialMenu()
+    {
+        modeSelected = false;
+        selectedMode = "";
+        gameStarted = false;
+        isPaused = false;
+        onSecondScreen = false;
+        currentIndex = 0;
+
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
+        if (confirmPanel != null) confirmPanel.SetActive(false);
+
+        if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(true);
+        if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(true);
+        if (mainExitButtonObject != null) mainExitButtonObject.SetActive(true);
+
+        if (startButtonObject != null) startButtonObject.SetActive(false);
+        if (backButtonObject != null) backButtonObject.SetActive(false);
+
+        UpdateHighlight(CurrentButtons());
+    }
     public void GoBack()
     {
         modeSelected = false;
@@ -170,7 +218,7 @@ public class GameMenuManager : MonoBehaviour
 
         if (startButtonObject != null) startButtonObject.SetActive(false);
         if (backButtonObject != null) backButtonObject.SetActive(false);
-    
+
         onSecondScreen = false;
         currentIndex = 0;
         UpdateHighlight(CurrentButtons());
@@ -179,10 +227,13 @@ public class GameMenuManager : MonoBehaviour
 
     private GameObject[] CurrentButtons()
     {
+        if (isPaused)
+            return new GameObject[] { resumeButtonObject, exitToMenuButtonObject };
+
         if (onSecondScreen)
             return new GameObject[] { startButtonObject, backButtonObject };
-        else
-            return new GameObject[] { singlePlayerButtonObject, multiplayerButtonObject, mainExitButtonObject };
+
+        return new GameObject[] { singlePlayerButtonObject, multiplayerButtonObject, mainExitButtonObject };
     }
 
     private void UpdateHighlight(GameObject[] buttons)
@@ -205,6 +256,8 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Enable();
         input.Menu.Navigate.performed += OnNavigate;
         input.Menu.Select.performed += OnSelect;
+        input.InGameAction.Enable();
+        input.InGameAction.Pause.performed += OnPausePressed;
     }
 
     void OnDisable()
@@ -212,5 +265,21 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Navigate.performed -= OnNavigate;
         input.Menu.Select.performed -= OnSelect;
         input.Menu.Disable();
+        input.InGameAction.Pause.performed -= OnPausePressed;
+        input.InGameAction.Disable();
+    }
+    private void OnPausePressed(InputAction.CallbackContext ctx)
+    {
+        if (!gameStarted) return;
+
+        if (isPaused)
+            ResumeGame();
+        else
+            PauseGame();
+    }
+    public void ExitToMainMenu()
+    {
+        Time.timeScale = 1f;
+        ShowInitialMenu();
     }
 }
