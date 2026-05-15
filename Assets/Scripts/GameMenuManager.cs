@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class GameMenuManager : MonoBehaviour
 {
@@ -23,6 +24,14 @@ public class GameMenuManager : MonoBehaviour
     [Header("Optional")]
     public string menuSceneName = "";
 
+    [Header("Navigation")]
+    public Color highlightColor = Color.yellow;
+    public Color normalColor = Color.white;
+
+    private int currentIndex = 0;
+    private bool onSecondScreen = false;
+    private PlayerInputActions input;
+
     private bool modeSelected = false;
     private string selectedMode = "";
 
@@ -39,6 +48,25 @@ public class GameMenuManager : MonoBehaviour
 
         if (startButtonObject != null) startButtonObject.SetActive(false);
         if (mainExitButtonObject != null) mainExitButtonObject.SetActive(true);
+
+        currentIndex = 0;   
+        UpdateHighlight(CurrentButtons());
+    }
+    private void OnNavigate(InputAction.CallbackContext ctx)
+    {
+        Vector2 value = ctx.ReadValue<Vector2>();
+        GameObject[] buttons = CurrentButtons();
+
+        if (value.y < -0.5f)
+            currentIndex = (currentIndex + 1) % buttons.Length;
+        else if (value.y > 0.5f)
+            currentIndex = (currentIndex - 1 + buttons.Length) % buttons.Length;
+
+        UpdateHighlight(buttons);
+    }
+    private void OnSelect(InputAction.CallbackContext ctx)
+    {
+        CurrentButtons()[currentIndex].GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
     }
 
     public void SelectSinglePlayer()
@@ -125,6 +153,10 @@ public class GameMenuManager : MonoBehaviour
         if (mainExitButtonObject != null) mainExitButtonObject.SetActive(false);
         if (startButtonObject != null) startButtonObject.SetActive(true);
         if (backButtonObject != null) backButtonObject.SetActive(true);
+
+        onSecondScreen = true;
+        currentIndex = 0;
+        UpdateHighlight(CurrentButtons());
     }
 
     public void GoBack()
@@ -138,5 +170,47 @@ public class GameMenuManager : MonoBehaviour
 
         if (startButtonObject != null) startButtonObject.SetActive(false);
         if (backButtonObject != null) backButtonObject.SetActive(false);
+    
+        onSecondScreen = false;
+        currentIndex = 0;
+        UpdateHighlight(CurrentButtons());
+    }
+
+
+    private GameObject[] CurrentButtons()
+    {
+        if (onSecondScreen)
+            return new GameObject[] { startButtonObject, backButtonObject };
+        else
+            return new GameObject[] { singlePlayerButtonObject, multiplayerButtonObject, mainExitButtonObject };
+    }
+
+    private void UpdateHighlight(GameObject[] buttons)
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] == null) continue;
+            var img = buttons[i].GetComponent<UnityEngine.UI.Image>();
+            if (img != null) img.color = (i == currentIndex) ? highlightColor : normalColor;
+        }
+    }
+
+    void Awake()
+    {
+        input = new PlayerInputActions();
+    }
+
+    void OnEnable()
+    {
+        input.Menu.Enable();
+        input.Menu.Navigate.performed += OnNavigate;
+        input.Menu.Select.performed += OnSelect;
+    }
+
+    void OnDisable()
+    {
+        input.Menu.Navigate.performed -= OnNavigate;
+        input.Menu.Select.performed -= OnSelect;
+        input.Menu.Disable();
     }
 }
