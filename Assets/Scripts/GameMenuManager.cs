@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class GameMenuManager : MonoBehaviour
 {
@@ -25,6 +26,18 @@ public class GameMenuManager : MonoBehaviour
     public GameObject resumeButtonObject;
     public GameObject exitToMenuButtonObject;
 
+    [Header("End Game Panels")]
+    public GameObject caughtPanel;
+    public GameObject escapedPanel;
+
+    [Header("End Game Buttons")]
+    public GameObject tryAgainButtonObject;
+    public GameObject playAgainButtonObject;
+    public GameObject endExitToMenuButtonObject;
+
+    [Header("End Game Animations")]
+    public RectTransform bustedText;
+
     [Header("Optional")]
     public string menuSceneName = "";
 
@@ -40,6 +53,7 @@ public class GameMenuManager : MonoBehaviour
     private string selectedMode = "";
     private bool gameStarted = false;
     private bool isPaused = false;
+    private bool gameEnded = false;
 
 
     void Start()
@@ -58,6 +72,8 @@ public class GameMenuManager : MonoBehaviour
 
         currentIndex = 0;
         UpdateHighlight(CurrentButtons());
+        if (caughtPanel != null) caughtPanel.SetActive(false);
+        if (escapedPanel != null) escapedPanel.SetActive(false);
     }
     private void OnNavigate(InputAction.CallbackContext ctx)
     {
@@ -190,6 +206,7 @@ public class GameMenuManager : MonoBehaviour
         modeSelected = false;
         selectedMode = "";
         gameStarted = false;
+        gameEnded = false;
         isPaused = false;
         onSecondScreen = false;
         currentIndex = 0;
@@ -197,6 +214,8 @@ public class GameMenuManager : MonoBehaviour
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
+        if (caughtPanel != null) caughtPanel.SetActive(false);     
+        if (escapedPanel != null) escapedPanel.SetActive(false); 
 
         if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(true);
         if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(true);
@@ -206,6 +225,7 @@ public class GameMenuManager : MonoBehaviour
         if (backButtonObject != null) backButtonObject.SetActive(false);
 
         UpdateHighlight(CurrentButtons());
+        
     }
     public void GoBack()
     {
@@ -227,6 +247,12 @@ public class GameMenuManager : MonoBehaviour
 
     private GameObject[] CurrentButtons()
     {
+        if (caughtPanel != null && caughtPanel.activeSelf)
+            return new GameObject[] { tryAgainButtonObject, endExitToMenuButtonObject };
+
+        if (escapedPanel != null && escapedPanel.activeSelf)
+            return new GameObject[] { playAgainButtonObject, endExitToMenuButtonObject };
+        
         if (isPaused)
             return new GameObject[] { resumeButtonObject, exitToMenuButtonObject };
 
@@ -285,5 +311,110 @@ public class GameMenuManager : MonoBehaviour
             cityGenerator.ClearCity();
 
         ShowInitialMenu();
+    }
+
+    public void TriggerCaught()
+    {
+        if (gameEnded || !gameStarted) return;
+        gameEnded = true;
+        gameStarted = false;
+        StartCoroutine(CaughtSequence());
+    }
+
+    public void TriggerEscaped()
+    {
+        if (gameEnded || !gameStarted) return;
+        gameEnded = true;
+        gameStarted = false;
+        StartCoroutine(EscapedSequence());
+    }
+
+    IEnumerator CaughtSequence()
+    {
+        GameObject playerCar = GameObject.Find("PlayerCar");
+        if (playerCar != null)
+        {
+            CarController cc = playerCar.GetComponentInChildren<CarController>();
+            if (cc != null) cc.enabled = false;
+            Rigidbody rb = playerCar.GetComponent<Rigidbody>();
+            if (rb != null) rb.linearVelocity = Vector3.zero;
+        }
+
+        GameObject policeCar = GameObject.Find("PoliceCar");
+        if (policeCar != null)
+        {
+            PoliceAIController ai = policeCar.GetComponent<PoliceAIController>();
+            if (ai != null) ai.enabled = false;
+        }
+
+        UnityEngine.UI.Image panelImage = caughtPanel != null
+            ? caughtPanel.GetComponent<UnityEngine.UI.Image>()
+            : null;
+
+        Color flashRed  = new Color(0.8f, 0f,   0f,   0.6f);
+        Color flashBlue = new Color(0f,   0.2f, 0.8f, 0.6f);
+
+        if (caughtPanel != null) caughtPanel.SetActive(true);
+
+        float elapsed   = 0f;
+        float flashTimer = 0f;
+        bool isRed = true;
+
+        while (elapsed < 1.5f)
+        {
+            elapsed += Time.deltaTime;
+            flashTimer += Time.deltaTime;
+
+            if (flashTimer >= 0.15f)
+            {
+                flashTimer = 0f;
+                isRed = !isRed;
+                if (panelImage != null) panelImage.color = isRed ? flashRed : flashBlue;
+            }
+
+            yield return null;
+        }
+
+        if (panelImage != null) panelImage.color = new Color(0.7f, 0f, 0f, 0.6f);
+
+        currentIndex = 0;
+        UpdateHighlight(CurrentButtons());
+    }
+
+    IEnumerator EscapedSequence()
+    {
+        GameObject playerCar = GameObject.Find("PlayerCar");
+        if (playerCar != null)
+        {
+            CarController cc = playerCar.GetComponentInChildren<CarController>();
+            if (cc != null) cc.enabled = false;
+        }
+
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            TopDownCamera topCam = mainCam.GetComponent<TopDownCamera>();
+            if (topCam != null) topCam.target = null;
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        if (escapedPanel != null) escapedPanel.SetActive(true);
+        currentIndex = 0;
+        UpdateHighlight(CurrentButtons());
+    }
+
+    public void TryAgain()
+    {
+        gameEnded = false;
+        if (caughtPanel != null) caughtPanel.SetActive(false);
+        StartGame();
+    }
+
+    public void PlayAgain()
+    {
+        gameEnded = false;
+        if (escapedPanel != null) escapedPanel.SetActive(false);
+        StartGame();
     }
 }

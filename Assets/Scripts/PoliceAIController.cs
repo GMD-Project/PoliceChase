@@ -26,6 +26,7 @@ public class PoliceAIController : MonoBehaviour
     private float stuckTimer;
     private float recoveryTimer;
     private bool isRecovering;
+    private GameMenuManager gameMenuManager;
 
     void Start()
     {
@@ -45,6 +46,7 @@ public class PoliceAIController : MonoBehaviour
             agent.updatePosition = false;
             agent.updateRotation = false;
         }   
+        gameMenuManager = FindObjectOfType<GameMenuManager>();
     }
 
     void FixedUpdate()
@@ -145,5 +147,12 @@ public class PoliceAIController : MonoBehaviour
         if (toPoint.sqrMagnitude < 0.01f) return 0f;
         float angle = Vector3.SignedAngle(carTransform.forward, toPoint.normalized, Vector3.up);
         return Mathf.Clamp(angle / 60f, -1f, 1f);
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (target == null || gameMenuManager == null) return;
+        Transform hit = collision.transform;
+        if (hit == target || hit.IsChildOf(target))
+            gameMenuManager.TriggerCaught();
     }
 }

@@ -29,6 +29,7 @@ public class CityGenerator : MonoBehaviour
     [Header("Chances")]
     [Range(0f, 1f)] public float treeChance = 0.2f;
     [Range(0f, 1f)] public float propChance = 0.15f;
+    [Range(0f, 1f)] public float extraConnectionChance = 0.2f; 
 
     [Header("Navigation")]
     public NavMeshSurface navMeshSurface;
@@ -42,6 +43,7 @@ public class CityGenerator : MonoBehaviour
     private Vector2Int _player1Tile;
     private Vector2Int _player1ForwardDir;
     private Transform _player1Transform;
+    private bool[,] reachableGrid;
 
 
     public void StartGame()
@@ -193,6 +195,7 @@ public class CityGenerator : MonoBehaviour
         Vector2Int start = new Vector2Int(0, 0);
         visited[start.x, start.y] = true;
         stack.Push(start);
+        roadGrid[start.x * 2 + 1, start.y * 2 + 1] = true; 
 
         while (stack.Count > 0)
         {
@@ -230,7 +233,21 @@ public class CityGenerator : MonoBehaviour
             }
         }
 
-        // Close all borders
+        for (int x = 1; x < width - 1; x++)
+        {
+            for (int z = 1; z < height - 1; z++)
+            {
+                if (roadGrid[x, z]) continue;
+                if (Random.value > extraConnectionChance) continue;
+
+                bool horizontal = roadGrid[x - 1, z] && roadGrid[x + 1, z];
+                bool vertical   = roadGrid[x, z - 1] && roadGrid[x, z + 1];
+
+                if (horizontal || vertical)
+                    roadGrid[x, z] = true;
+            }
+        }
+
         for (int x = 0; x < width; x++)
         {
             roadGrid[x, 0] = false;
@@ -242,20 +259,39 @@ public class CityGenerator : MonoBehaviour
             roadGrid[width - 1, z] = false;
         }
 
-        // Collect valid exit candidates (border tiles touching an interior road)
+        reachableGrid = new bool[width, height];
+        Queue<Vector2Int> bfsQueue = new Queue<Vector2Int>();
+        Vector2Int seed = new Vector2Int(1, 1);
+        if (roadGrid[seed.x, seed.y])
+        {
+            reachableGrid[seed.x, seed.y] = true;
+            bfsQueue.Enqueue(seed);
+        }
+        Vector2Int[] bfsDirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
+        while (bfsQueue.Count > 0)
+        {
+            Vector2Int curr = bfsQueue.Dequeue();
+            foreach (var d in bfsDirs)
+            {
+                Vector2Int nb = curr + d;
+                if (nb.x < 0 || nb.x >= width || nb.y < 0 || nb.y >= height) continue;
+                if (!roadGrid[nb.x, nb.y] || reachableGrid[nb.x, nb.y]) continue;
+                reachableGrid[nb.x, nb.y] = true;
+                bfsQueue.Enqueue(nb);
+            }
+        }
         List<Vector2Int> exits = new List<Vector2Int>();
         for (int x = 1; x < width - 1; x++)
         {
-            if (roadGrid[x, 1]) exits.Add(new Vector2Int(x, 0));
-            if (roadGrid[x, height - 2]) exits.Add(new Vector2Int(x, height - 1));
+            if (roadGrid[x, 1]          && reachableGrid[x, 1])          exits.Add(new Vector2Int(x, 0));
+            if (roadGrid[x, height - 2] && reachableGrid[x, height - 2]) exits.Add(new Vector2Int(x, height - 1));
         }
         for (int z = 1; z < height - 1; z++)
         {
-            if (roadGrid[1, z]) exits.Add(new Vector2Int(0, z));
-            if (roadGrid[width - 2, z]) exits.Add(new Vector2Int(width - 1, z));
+            if (roadGrid[1, z]          && reachableGrid[1, z])          exits.Add(new Vector2Int(0, z));
+            if (roadGrid[width - 2, z]  && reachableGrid[width - 2, z])  exits.Add(new Vector2Int(width - 1, z));
         }
 
-        // Open one random exit
         if (exits.Count > 0)
         {
             Vector2Int exit = exits[Random.Range(0, exits.Count)];
@@ -275,6 +311,7 @@ public class CityGenerator : MonoBehaviour
             for (int z = 1; z < height - 1; z++)
             {
                 if (!roadGrid[x, z]) continue;
+                if (!reachableGrid[x, z]) continue;
 
                 int neighbours = 0;
                 if (roadGrid[x + 1, z]) neighbours++;
@@ -322,6 +359,8 @@ public class CityGenerator : MonoBehaviour
             TopDownCamera cam = mainCam.GetComponent<TopDownCamera>();
             if (cam != null) cam.target = player.transform;
         }
+
+        SpawnExitTrigger();
 
         SpawnPlayer2();
 
@@ -389,7 +428,8 @@ public class CityGenerator : MonoBehaviour
 
             if (ai != null)
                 ai.enabled = false;
-
+                
+            player2.AddComponent<MultiplayerCatchDetector>();
             GameObject cam2Obj = new GameObject("Player2Camera");
             Camera cam2 = cam2Obj.AddComponent<Camera>();
             cam2.rect = new Rect(0.5f, 0f, 0.5f, 1f);
@@ -427,5 +467,18 @@ public class CityGenerator : MonoBehaviour
 
         GameObject player2Camera = GameObject.Find("Player2Camera");
         if (player2Camera != null) Destroy(player2Camera);
+
+        GameObject exitTrigger = GameObject.Find("ExitTrigger");
+        if (exitTrigger != null) Destroy(exitTrigger);
+    }
+    void SpawnExitTrigger()
+    {
+        Vector3 exitPos = new Vector3(exitTile.x * tileSize, 0.5f, exitTile.y * tileSize);
+        GameObject exitObj = new GameObject("ExitTrigger");
+        exitObj.transform.position = exitPos;
+        BoxCollider col = exitObj.AddComponent<BoxCollider>();
+        col.isTrigger = true;
+        col.size = new Vector3(tileSize, 3f, tileSize);
+        exitObj.AddComponent<ExitTrigger>();
     }
 }
