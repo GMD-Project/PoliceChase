@@ -33,7 +33,8 @@ public class GameMenuManager : MonoBehaviour
     [Header("End Game Buttons")]
     public GameObject tryAgainButtonObject;
     public GameObject playAgainButtonObject;
-    public GameObject endExitToMenuButtonObject;
+    public GameObject caughtExitButtonObject;
+    public GameObject escapedExitButtonObject;
 
     [Header("End Game Animations")]
     public RectTransform bustedText;
@@ -248,26 +249,27 @@ public class GameMenuManager : MonoBehaviour
     private GameObject[] CurrentButtons()
     {
         if (caughtPanel != null && caughtPanel.activeSelf)
-            return new GameObject[] { tryAgainButtonObject, endExitToMenuButtonObject };
+            return new GameObject[] { tryAgainButtonObject, caughtExitButtonObject };
 
         if (escapedPanel != null && escapedPanel.activeSelf)
-            return new GameObject[] { playAgainButtonObject, endExitToMenuButtonObject };
+            return new GameObject[] { playAgainButtonObject, escapedExitButtonObject };
         
         if (isPaused)
             return new GameObject[] { resumeButtonObject, exitToMenuButtonObject };
 
         if (onSecondScreen)
-            return new GameObject[] { startButtonObject, backButtonObject };
+            return new GameObject[] { startButtonObject, backButtonObject };    
 
         return new GameObject[] { singlePlayerButtonObject, multiplayerButtonObject, mainExitButtonObject };
-    }
+        
+         }
 
     private void UpdateHighlight(GameObject[] buttons)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i] == null) continue;
-            var img = buttons[i].GetComponent<UnityEngine.UI.Image>();
+            var img = buttons[i].GetComponentInChildren<UnityEngine.UI.Image>();
             if (img != null) img.color = (i == currentIndex) ? highlightColor : normalColor;
         }
     }

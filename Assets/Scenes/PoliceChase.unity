@@ -4330,9 +4330,10 @@ MonoBehaviour:
   exitToMenuButtonObject: {fileID: 1495529200}
   caughtPanel: {fileID: 1924265360}
   escapedPanel: {fileID: 258899100}
-  tryAgainButtonObject: {fileID: 1852614939}
+  tryAgainButtonObject: {fileID: 312128214}
   playAgainButtonObject: {fileID: 689428956}
-  endExitToMenuButtonObject: {fileID: 353034233}
+  caughtExitButtonObject: {fileID: 353034233}
+  escapedExitButtonObject: {fileID: 1537333725}
   bustedText: {fileID: 822542687}
   menuSceneName: 
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
