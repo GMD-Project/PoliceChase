@@ -90,6 +90,8 @@ public class GameMenuManager : MonoBehaviour
     }
     private void OnSelect(InputAction.CallbackContext ctx)
     {
+        if (!mainMenuPanel.activeInHierarchy && !confirmPanel.activeInHierarchy && !caughtPanel.activeInHierarchy && !escapedPanel.activeInHierarchy)
+            return;
         GameObject[] buttons = CurrentButtons();
         if (buttons.Length == 0) return;
         if (buttons[currentIndex] == null) return;
@@ -215,8 +217,8 @@ public class GameMenuManager : MonoBehaviour
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
-        if (caughtPanel != null) caughtPanel.SetActive(false);     
-        if (escapedPanel != null) escapedPanel.SetActive(false); 
+        if (caughtPanel != null) caughtPanel.SetActive(false);
+        if (escapedPanel != null) escapedPanel.SetActive(false);
 
         if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(true);
         if (multiplayerButtonObject != null) multiplayerButtonObject.SetActive(true);
@@ -226,7 +228,7 @@ public class GameMenuManager : MonoBehaviour
         if (backButtonObject != null) backButtonObject.SetActive(false);
 
         UpdateHighlight(CurrentButtons());
-        
+
     }
     public void GoBack()
     {
@@ -253,16 +255,16 @@ public class GameMenuManager : MonoBehaviour
 
         if (escapedPanel != null && escapedPanel.activeSelf)
             return new GameObject[] { playAgainButtonObject, escapedExitButtonObject };
-        
+
         if (isPaused)
             return new GameObject[] { resumeButtonObject, exitToMenuButtonObject };
 
         if (onSecondScreen)
-            return new GameObject[] { startButtonObject, backButtonObject };    
+            return new GameObject[] { startButtonObject, backButtonObject };
 
         return new GameObject[] { singlePlayerButtonObject, multiplayerButtonObject, mainExitButtonObject };
-        
-         }
+
+    }
 
     private void UpdateHighlight(GameObject[] buttons)
     {
@@ -353,12 +355,12 @@ public class GameMenuManager : MonoBehaviour
             ? caughtPanel.GetComponent<UnityEngine.UI.Image>()
             : null;
 
-        Color flashRed  = new Color(0.8f, 0f,   0f,   0.6f);
-        Color flashBlue = new Color(0f,   0.2f, 0.8f, 0.6f);
+        Color flashRed = new Color(0.8f, 0f, 0f, 0.6f);
+        Color flashBlue = new Color(0f, 0.2f, 0.8f, 0.6f);
 
         if (caughtPanel != null) caughtPanel.SetActive(true);
 
-        float elapsed   = 0f;
+        float elapsed = 0f;
         float flashTimer = 0f;
         bool isRed = true;
 
@@ -424,8 +426,8 @@ public class GameMenuManager : MonoBehaviour
 
             if (sun != null)
             {
-                sun.color     = Color.Lerp(originalColor,   sunsetColor, t);
-                sun.intensity = Mathf.Lerp(originalIntensity, 0.6f,     t);
+                sun.color = Color.Lerp(originalColor, sunsetColor, t);
+                sun.intensity = Mathf.Lerp(originalIntensity, 0.6f, t);
             }
 
             if (mainCam != null && playerCar != null)
