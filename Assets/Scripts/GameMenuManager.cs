@@ -386,20 +386,59 @@ public class GameMenuManager : MonoBehaviour
     IEnumerator EscapedSequence()
     {
         GameObject playerCar = GameObject.Find("PlayerCar");
+        Rigidbody rb = null;
+
         if (playerCar != null)
         {
             CarController cc = playerCar.GetComponentInChildren<CarController>();
             if (cc != null) cc.enabled = false;
+            rb = playerCar.GetComponent<Rigidbody>();
+            if (rb != null) rb.constraints = RigidbodyConstraints.FreezePositionY
+                                        | RigidbodyConstraints.FreezeRotationX
+                                        | RigidbodyConstraints.FreezeRotationZ;
         }
 
         Camera mainCam = Camera.main;
         if (mainCam != null)
         {
             TopDownCamera topCam = mainCam.GetComponent<TopDownCamera>();
-            if (topCam != null) topCam.target = null;
+            if (topCam != null) topCam.enabled = false;
         }
 
-        yield return new WaitForSeconds(2f);
+        Light sun = RenderSettings.sun;
+        Color sunsetColor = new Color(1f, 0.45f, 0.1f);
+        Color originalColor = sun != null ? sun.color : Color.white;
+        float originalIntensity = sun != null ? sun.intensity : 1f;
+
+        float cinematicDuration = 4.5f;
+        float elapsed = 0f;
+        float driveSpeed = 15f;
+
+        while (elapsed < cinematicDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / cinematicDuration;
+
+            if (playerCar != null && rb != null)
+                rb.linearVelocity = playerCar.transform.forward * driveSpeed;
+
+            if (sun != null)
+            {
+                sun.color     = Color.Lerp(originalColor,   sunsetColor, t);
+                sun.intensity = Mathf.Lerp(originalIntensity, 0.6f,     t);
+            }
+
+            if (mainCam != null && playerCar != null)
+            {
+                Vector3 target = playerCar.transform.position
+                            - playerCar.transform.forward * 8f
+                            + Vector3.up * 3.5f;
+                mainCam.transform.position = Vector3.Lerp(mainCam.transform.position, target, Time.deltaTime * 4f);
+                mainCam.transform.LookAt(playerCar.transform.position + playerCar.transform.forward * 4f);
+            }
+
+            yield return null;
+        }
 
         if (escapedPanel != null) escapedPanel.SetActive(true);
         currentIndex = 0;

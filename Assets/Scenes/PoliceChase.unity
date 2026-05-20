@@ -3289,6 +3289,9 @@ MonoBehaviour:
   deadEndPrefabs:
   - {fileID: 7893901977543645526, guid: 0ff856192de3db649b1501f64519b29d, type: 3}
   - {fileID: 867190217525862037, guid: 7be5369fc275971458de9b7f2505e630, type: 3}
+  desertRoadLength: 25
+  desertMaterial: {fileID: 2100000, guid: b5ced793883eff9439dfb6d7848aead2, type: 2}
+  desertRoadPrefab: {fileID: 3301257244871238459, guid: bbf6aaa394158294db5535dd05892380, type: 3}
   buildingPrefabs:
   - {fileID: 4976880366369161607, guid: 454d6dc1f7e4a464e99f2204dd95c9f0, type: 3}
   - {fileID: 8576294685000717922, guid: 3a0092e896feaf341bbe0cc0e30b0bbe, type: 3}

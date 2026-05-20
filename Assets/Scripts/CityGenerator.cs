@@ -18,6 +18,11 @@ public class CityGenerator : MonoBehaviour
     public GameObject[] crossroadPrefabs;
     public GameObject[] deadEndPrefabs;
 
+    [Header("Desert")]
+    public int desertRoadLength = 25;
+    public Material desertMaterial;
+    public GameObject desertRoadPrefab;
+
     [Header("Building & Decoration")]
     public GameObject[] buildingPrefabs;
     public GameObject[] treePrefabs;
@@ -73,7 +78,7 @@ public class CityGenerator : MonoBehaviour
             navMeshSurface.BuildNavMesh();
 
         }
-            
+        SpawnDesert();    
         SpawnPlayer();
     }
 
@@ -480,5 +485,41 @@ public class CityGenerator : MonoBehaviour
         col.isTrigger = true;
         col.size = new Vector3(tileSize, 3f, tileSize);
         exitObj.AddComponent<ExitTrigger>();
+    }
+
+    Vector2Int GetExitDirection()
+    {
+        if (exitTile.x == 0)          return new Vector2Int(-1,  0);
+        if (exitTile.x == width - 1)  return new Vector2Int( 1,  0);
+        if (exitTile.y == 0)          return new Vector2Int( 0, -1);
+        return                               new Vector2Int( 0,  1);
+    }
+
+    void SpawnDesert()
+    {
+        float cityW   = width  * tileSize;
+        float cityH   = height * tileSize;
+        float padding = (desertRoadLength + 5) * tileSize;
+
+        GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        ground.name = "DesertGround";
+        ground.transform.parent = transform;
+        ground.transform.position = new Vector3(cityW / 2f, -0.02f, cityH / 2f);
+        ground.transform.localScale = new Vector3((cityW + padding * 2f) / 10f, 1f, (cityH + padding * 2f) / 10f);
+        if (desertMaterial != null)
+            ground.GetComponent<Renderer>().material = desertMaterial;
+        Destroy(ground.GetComponent<Collider>());
+
+        Vector2Int dir = GetExitDirection();
+        float yRot = (dir.x != 0) ? 0f : 90f;
+        for (int i = 1; i <= desertRoadLength; i++)
+        {
+            Vector3 pos = new Vector3(
+                (exitTile.x + dir.x * i) * tileSize,
+                0f,
+                (exitTile.y + dir.y * i) * tileSize
+            );
+            Instantiate(desertRoadPrefab, pos, Quaternion.Euler(0, yRot, 0), transform);
+        }
     }
 }

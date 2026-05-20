@@ -22,15 +22,17 @@ public class CarController : MonoBehaviour
     void OnEnable()
     {
         if (isPlayer2)
-        {
-            input.Player2.Get().devices = new[] { Gamepad.all[0] };
-            input.Player2.Enable();
-        }
-        else
-        {
-            input.Player.Get().devices = new[] { Gamepad.all[1] };
-            input.Player.Enable();
-        }
+    {
+        if (Gamepad.all.Count > 1)
+            input.Player2.Get().devices = new[] { Gamepad.all[1] };
+        input.Player2.Enable();
+    }
+    else
+    {
+        if (Gamepad.all.Count > 0)
+            input.Player.Get().devices = new[] { Gamepad.all[0] };
+        input.Player.Enable();
+    }
     }
 
     void OnDisable()
