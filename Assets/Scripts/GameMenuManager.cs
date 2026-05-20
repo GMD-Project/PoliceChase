@@ -2,9 +2,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System;
 
 public class GameMenuManager : MonoBehaviour
 {
+    public static Action OnPlayerCaught;
+    public static Action OnPlayerEscaped;
+    public static void RaisePlayerCaught()  => OnPlayerCaught?.Invoke();
+    public static void RaisePlayerEscaped() => OnPlayerEscaped?.Invoke();
+
     [Header("References")]
     public CityGenerator cityGenerator;
 
@@ -301,6 +307,8 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Select.performed += OnSelect;
         input.InGameAction.Enable();
         input.InGameAction.Pause.performed += OnPausePressed;
+        OnPlayerCaught += TriggerCaught;
+        OnPlayerEscaped += TriggerEscaped;
     }
 
     void OnDisable()
@@ -310,6 +318,8 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Disable();
         input.InGameAction.Pause.performed -= OnPausePressed;
         input.InGameAction.Disable();
+        OnPlayerCaught -= TriggerCaught;
+        OnPlayerEscaped -= TriggerEscaped;
     }
     private void OnPausePressed(InputAction.CallbackContext ctx)
     {

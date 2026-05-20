@@ -26,7 +26,6 @@ public class PoliceAIController : MonoBehaviour
     private float stuckTimer;
     private float recoveryTimer;
     private bool isRecovering;
-    private GameMenuManager gameMenuManager;
 
     void Start()
     {
@@ -46,8 +45,7 @@ public class PoliceAIController : MonoBehaviour
             agent.updatePosition = false;
             agent.updateRotation = false;
         }   
-        gameMenuManager = FindObjectOfType<GameMenuManager>();
-    }
+        }
 
     void FixedUpdate()
     {
@@ -150,9 +148,9 @@ public class PoliceAIController : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
-        if (target == null || gameMenuManager == null) return;
+        if (target == null) return;
         Transform hit = collision.transform;
         if (hit == target || hit.IsChildOf(target))
-            gameMenuManager.TriggerCaught();
+            GameMenuManager.RaisePlayerCaught();
     }
 }
