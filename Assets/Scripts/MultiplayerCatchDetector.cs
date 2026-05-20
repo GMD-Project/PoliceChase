@@ -5,6 +5,6 @@ public class MultiplayerCatchDetector : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.root.name == "PlayerCar")
-            GameMenuManager.OnPlayerCaught?.Invoke();
+            GameMenuManager.RaisePlayerCaught();
     }
 }

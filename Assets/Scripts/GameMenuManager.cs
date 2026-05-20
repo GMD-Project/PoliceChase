@@ -6,8 +6,8 @@ using System;
 
 public class GameMenuManager : MonoBehaviour
 {
-    public static Action OnPlayerCaught;
-    public static Action OnPlayerEscaped;
+    public static event Action OnPlayerCaught;
+    public static event Action OnPlayerEscaped;
     public static void RaisePlayerCaught()  => OnPlayerCaught?.Invoke();
     public static void RaisePlayerEscaped() => OnPlayerEscaped?.Invoke();
 
