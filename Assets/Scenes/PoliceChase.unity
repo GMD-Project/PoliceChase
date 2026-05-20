@@ -4414,6 +4414,10 @@ MonoBehaviour:
   caughtExitButtonObject: {fileID: 353034233}
   escapedExitButtonObject: {fileID: 1537333725}
   bustedText: {fileID: 822542687}
+  menuMusic: {fileID: 8300000, guid: 459445fcfdf522824a37cf69a5d22418, type: 3}
+  gameMusic: {fileID: 8300000, guid: 31eed22611b965043abe9f7c5f201037, type: 3}
+  escapeMusic: {fileID: 8300000, guid: 7761f3f09cee2453193c5f47336688a4, type: 3}
+  caughtMusic: {fileID: 8300000, guid: 347aa09486f953f4480429b288a507c3, type: 3}
   menuSceneName: 
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   normalColor: {r: 1, g: 1, b: 1, a: 1}

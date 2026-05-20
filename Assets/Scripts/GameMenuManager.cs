@@ -39,6 +39,12 @@ public class GameMenuManager : MonoBehaviour
     [Header("End Game Animations")]
     public RectTransform bustedText;
 
+    [Header("Audio")]
+    public AudioClip menuMusic;
+    public AudioClip gameMusic;
+    public AudioClip escapeMusic;
+    public AudioClip caughtMusic;
+
     [Header("Optional")]
     public string menuSceneName = "";
 
@@ -49,7 +55,7 @@ public class GameMenuManager : MonoBehaviour
     private int currentIndex = 0;
     private bool onSecondScreen = false;
     private PlayerInputActions input;
-
+    private AudioSource audioSource;
     private bool modeSelected = false;
     private string selectedMode = "";
     private bool gameStarted = false;
@@ -60,6 +66,10 @@ public class GameMenuManager : MonoBehaviour
     void Start()
     {
         Time.timeScale = 1f;
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.loop = true;
+        audioSource.volume = 1f;
+        PlayMusic(menuMusic);
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
@@ -141,6 +151,7 @@ public class GameMenuManager : MonoBehaviour
         if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
 
         Time.timeScale = 1f;
+        PlayMusic(gameMusic);
     }
 
     public void PauseGame()
@@ -149,6 +160,7 @@ public class GameMenuManager : MonoBehaviour
 
         isPaused = true;
         Time.timeScale = 0f;
+        PlayMusic(menuMusic);
 
         if (confirmPanel != null)
             confirmPanel.SetActive(true);
@@ -161,6 +173,7 @@ public class GameMenuManager : MonoBehaviour
     {
         isPaused = false;
         Time.timeScale = 1f;
+        PlayMusic(gameMusic);
 
         if (confirmPanel != null)
             confirmPanel.SetActive(false);
@@ -313,6 +326,7 @@ public class GameMenuManager : MonoBehaviour
 
         if (cityGenerator != null)
             cityGenerator.ClearCity();
+        PlayMusic(menuMusic);
 
         ShowInitialMenu();
     }
@@ -335,6 +349,7 @@ public class GameMenuManager : MonoBehaviour
 
     IEnumerator CaughtSequence()
     {
+        PlayMusic(caughtMusic);
         GameObject playerCar = GameObject.Find("PlayerCar");
         if (playerCar != null)
         {
@@ -387,6 +402,7 @@ public class GameMenuManager : MonoBehaviour
 
     IEnumerator EscapedSequence()
     {
+        PlayMusic(escapeMusic);
         GameObject playerCar = GameObject.Find("PlayerCar");
         Rigidbody rb = null;
 
@@ -459,5 +475,13 @@ public class GameMenuManager : MonoBehaviour
         gameEnded = false;
         if (escapedPanel != null) escapedPanel.SetActive(false);
         StartGame();
+    }
+
+    void PlayMusic(AudioClip clip)
+    {
+        if (clip == null || audioSource == null) return;
+        if (audioSource.clip == clip) return;
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 }
