@@ -4,6 +4,8 @@ using UnityEngine.AI;
 
 public class PoliceAIController : MonoBehaviour
 {
+    public enum State { Chasing, Recovering, Caught }
+
     [Header("Target")]
     public Transform target;
 
@@ -22,10 +24,9 @@ public class PoliceAIController : MonoBehaviour
     private Rigidbody rb;
     private Transform carTransform;
     private NavMeshAgent agent;
-
+    private State currentState;
     private float stuckTimer;
     private float recoveryTimer;
-    private bool isRecovering;
 
     void Start()
     {
@@ -45,6 +46,7 @@ public class PoliceAIController : MonoBehaviour
             agent.updatePosition = false;
             agent.updateRotation = false;
         }   
+        EnterState(State.Chasing);
         }
 
     void FixedUpdate()
@@ -54,13 +56,13 @@ public class PoliceAIController : MonoBehaviour
        agent.SetDestination(target.position);
         agent.nextPosition = carTransform.position;
 
-        if (isRecovering)
+       switch (currentState)
         {
-            HandleRecovery();
-            return;
+            case State.Chasing:    HandleChase();    break;
+            case State.Recovering: HandleRecovery(); break;
+            case State.Caught:                       break;
         }
 
-        HandleChase();
     }
 
     void HandleChase()
@@ -73,7 +75,18 @@ public class PoliceAIController : MonoBehaviour
         );
         float speedFactor = Mathf.Lerp(1f, minSpeedFactor, Mathf.Clamp01((Mathf.Abs(steer) - 0.3f) / 0.7f));
         rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, carTransform.forward * forwardSpeed * speedFactor, 12f * Time.fixedDeltaTime);  
-        CheckIfStuck();
+        Vector3 flatVelocity = rb.linearVelocity;
+        flatVelocity.y = 0f;
+        if (flatVelocity.magnitude < stuckSpeedThreshold)
+        {
+            stuckTimer += Time.fixedDeltaTime;
+            if (stuckTimer >= stuckTime)
+                EnterState(State.Recovering);
+        }
+        else
+        {
+            stuckTimer = 0f;
+        }
     }
 
     void HandleRecovery()
@@ -82,32 +95,7 @@ public class PoliceAIController : MonoBehaviour
         rb.linearVelocity = -carTransform.forward * reverseSpeed;
 
         if (recoveryTimer <= 0f)
-        {
-            isRecovering = false;
-            stuckTimer = 0f;
-            agent.ResetPath();
-        }
-    }
-    void CheckIfStuck()
-    {
-        Vector3 flatVelocity = rb.linearVelocity;
-        flatVelocity.y = 0f;
-
-        if (flatVelocity.magnitude < stuckSpeedThreshold)
-        {
-            stuckTimer += Time.fixedDeltaTime;
-
-            if (stuckTimer >= stuckTime)
-            {
-                isRecovering = true;
-                recoveryTimer = recoveryDuration;
-                stuckTimer = 0f;
-            }
-        }
-        else
-        {
-            stuckTimer = 0f;
-        }
+        EnterState(State.Chasing);
     }
 
     Vector3 GetChasePoint()
@@ -148,9 +136,30 @@ public class PoliceAIController : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
-        if (target == null) return;
+        if (target == null || currentState == State.Caught) return;
         Transform hit = collision.transform;
         if (hit == target || hit.IsChildOf(target))
+        {
+            EnterState(State.Caught);
             GameMenuManager.RaisePlayerCaught();
+        }
+    }
+    void EnterState(State newState)
+    {
+        currentState = newState;
+
+        switch (newState)
+        {
+            case State.Chasing:
+                stuckTimer = 0f;
+                agent.ResetPath();
+                break;
+            case State.Recovering:
+                recoveryTimer = recoveryDuration;
+                break;
+            case State.Caught:
+                rb.linearVelocity = Vector3.zero;
+                break;
+        }
     }
 }
