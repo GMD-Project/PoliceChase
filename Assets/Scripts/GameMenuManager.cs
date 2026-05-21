@@ -16,7 +16,6 @@ public class GameMenuManager : MonoBehaviour
 
     [Header("Panels")]
     public GameObject mainMenuPanel;
-    public GameObject inGameMenuPanel;
     public GameObject confirmPanel;
 
     [Header("Mode Buttons")]
@@ -80,7 +79,6 @@ public class GameMenuManager : MonoBehaviour
         PlayMusic(menuMusic);
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
 
         if (singlePlayerButtonObject != null) singlePlayerButtonObject.SetActive(true);
@@ -163,7 +161,6 @@ public class GameMenuManager : MonoBehaviour
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
-        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
 
         Time.timeScale = 1f;
         PlayMusic(gameMusic);
@@ -200,11 +197,6 @@ public class GameMenuManager : MonoBehaviour
             confirmPanel.SetActive(false);
 
         currentIndex = 0;
-    }
-
-    public void ContinueGame()
-    {
-        ResumeGame();
     }
 
     public void ExitGame()
@@ -249,7 +241,6 @@ public class GameMenuManager : MonoBehaviour
         currentIndex = 0;
 
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-        if (inGameMenuPanel != null) inGameMenuPanel.SetActive(false);
         if (confirmPanel != null) confirmPanel.SetActive(false);
         if (caughtPanel != null) caughtPanel.SetActive(false);
         if (escapedPanel != null) escapedPanel.SetActive(false);
@@ -320,8 +311,6 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Enable();
         input.Menu.Navigate.performed += OnNavigate;
         input.Menu.Select.performed += OnSelect;
-        input.InGameAction.Enable();
-        input.InGameAction.Pause.performed += OnPausePressed;
         OnPlayerCaught += TriggerCaught;
         OnPlayerEscaped += TriggerEscaped;
     }
@@ -331,8 +320,6 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Navigate.performed -= OnNavigate;
         input.Menu.Select.performed -= OnSelect;
         input.Menu.Disable();
-        input.InGameAction.Pause.performed -= OnPausePressed;
-        input.InGameAction.Disable();
         OnPlayerCaught -= TriggerCaught;
         OnPlayerEscaped -= TriggerEscaped;
     }

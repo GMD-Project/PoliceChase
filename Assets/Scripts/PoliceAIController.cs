@@ -1,4 +1,4 @@
-// File: Assets/Scripts/PoliceAIController.cs
+
 using UnityEngine;
 using UnityEngine.AI;
 
