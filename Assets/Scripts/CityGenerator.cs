@@ -26,16 +26,14 @@ public class CityGenerator : MonoBehaviour
 
     [Header("Building & Decoration")]
     public GameObject[] buildingPrefabs;
-    public GameObject[] treePrefabs;
+    
     [Header("Road Props")]
     public GameObject[] trafficLightPrefabs;
     public GameObject[] signPrefabs;
-    [Range(0f, 1f)] public float signChance = 0.3f;
 
     [Header("Chances")]
-    [Range(0f, 1f)] public float treeChance = 0.2f;
-    [Range(0f, 1f)] public float propChance = 0.15f;
     [Range(0f, 1f)] public float extraConnectionChance = 0.2f; 
+    [Range(0f, 1f)] public float signChance = 0.3f;
 
     [Header("Navigation")]
     public NavMeshSurface navMeshSurface;
