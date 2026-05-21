@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using System.Collections;
 public class CityGenerator : MonoBehaviour
 {
     [Header("City Size")]
@@ -53,8 +54,12 @@ public class CityGenerator : MonoBehaviour
 
     public void StartGame()
     {
-        Debug.Log("CityGenerator.StartGame called");
+        StartCoroutine(StartGameRoutine());
+    }
+    IEnumerator StartGameRoutine()
+    {
         ClearCity();
+        yield return null; 
         GenerateCity();
     }
 
@@ -71,6 +76,7 @@ public class CityGenerator : MonoBehaviour
         if (navMeshSurface != null)
         {
             GameObject ground = new GameObject("NavMeshGround");
+            ground.transform.parent = transform;
             ground.layer = LayerMask.NameToLayer("NavMeshObstacle");
             BoxCollider groundCol = ground.AddComponent<BoxCollider>();
             groundCol.center = new Vector3((width * tileSize) / 2f, -0.1f, (height * tileSize) / 2f);
@@ -362,7 +368,16 @@ public class CityGenerator : MonoBehaviour
                 mainCam.rect = new Rect(0f, 0f, 1f, 1f);
 
             TopDownCamera cam = mainCam.GetComponent<TopDownCamera>();
-            if (cam != null) cam.target = player.transform;
+            if (cam != null)
+            {
+                cam.target = player.transform;
+                cam.enabled = true;
+                mainCam.transform.position = new Vector3(
+                    player.transform.position.x,
+                    player.transform.position.y + cam.height,
+                    player.transform.position.z
+                );
+            }
         }
 
         SpawnExitTrigger();
@@ -434,6 +449,8 @@ public class CityGenerator : MonoBehaviour
             if (ai != null)
                 ai.enabled = false;
                 
+            if (_player1Transform != null)
+                SetLayerRecursively(player2, _player1Transform.gameObject.layer);
             player2.AddComponent<MultiplayerCatchDetector>();
             GameObject cam2Obj = new GameObject("Player2Camera");
             Camera cam2 = cam2Obj.AddComponent<Camera>();
@@ -521,5 +538,11 @@ public class CityGenerator : MonoBehaviour
             );
             Instantiate(desertRoadPrefab, pos, Quaternion.Euler(0, yRot, 0), transform);
         }
+    }
+    void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+            SetLayerRecursively(child.gameObject, layer);
     }
 }

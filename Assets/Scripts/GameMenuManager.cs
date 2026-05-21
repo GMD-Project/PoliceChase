@@ -67,6 +67,8 @@ public class GameMenuManager : MonoBehaviour
     private bool gameStarted = false;
     private bool isPaused = false;
     private bool gameEnded = false;
+    private Color _originalSunColor = Color.white;
+    private float _originalSunIntensity = 1f;
 
 
     void Start()
@@ -91,6 +93,13 @@ public class GameMenuManager : MonoBehaviour
         UpdateHighlight(CurrentButtons());
         if (caughtPanel != null) caughtPanel.SetActive(false);
         if (escapedPanel != null) escapedPanel.SetActive(false);
+
+        Light sun = RenderSettings.sun;
+        if (sun != null)
+        {
+            _originalSunColor = sun.color;
+            _originalSunIntensity = sun.intensity;
+        }
     }
     private void OnNavigate(InputAction.CallbackContext ctx)
     {
@@ -158,6 +167,12 @@ public class GameMenuManager : MonoBehaviour
 
         Time.timeScale = 1f;
         PlayMusic(gameMusic);
+        Light sun = RenderSettings.sun;
+        if (sun != null)
+        {
+            sun.color = _originalSunColor;
+            sun.intensity = _originalSunIntensity;
+        }
     }
 
     public void PauseGame()
