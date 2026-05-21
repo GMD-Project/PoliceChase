@@ -2179,81 +2179,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &856540218
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 856540219}
-  - component: {fileID: 856540221}
-  - component: {fileID: 856540220}
-  m_Layer: 5
-  m_Name: inGameMenuPanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &856540219
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856540218}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1371668465}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &856540220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856540218}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &856540221
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856540218}
-  m_CullTransparentMesh: 1
 --- !u!1 &903404801
 GameObject:
   m_ObjectHideFlags: 0
@@ -3095,7 +3020,6 @@ RectTransform:
   m_Children:
   - {fileID: 1004821437}
   - {fileID: 2096889351}
-  - {fileID: 856540219}
   - {fileID: 1924265361}
   - {fileID: 258899101}
   m_Father: {fileID: 0}
@@ -3367,12 +3291,6 @@ MonoBehaviour:
   - {fileID: 650591154451796056, guid: 459bf6bc825ea9845822408053e0b7aa, type: 3}
   - {fileID: 3021394072774387150, guid: f9be95d7f56731f4b97c4011e28edaab, type: 3}
   - {fileID: 2661994169556932180, guid: 0972cd229ac9d20489bbc3a57a51be46, type: 3}
-  treePrefabs:
-  - {fileID: 6184434111218818029, guid: 5ed59cd74d779b247a0de3970801fda1, type: 3}
-  - {fileID: 2613924079921196393, guid: 2643cc8c8bd191d4aa2a0f3d50abab65, type: 3}
-  - {fileID: 3489192851198715285, guid: 6ce5d694780084341b1025650bdd432c, type: 3}
-  - {fileID: 2060589233173438422, guid: 8ce6b6e7fcdc39243881ee68d05db72a, type: 3}
-  - {fileID: 5716472912363847415, guid: dae355c214058de40833e1dc07b9568c, type: 3}
   trafficLightPrefabs: []
   signPrefabs:
   - {fileID: 7195187737987913630, guid: d3e0ea8d2ad84a44b9969cd6eb557c95, type: 3}
@@ -3412,10 +3330,8 @@ MonoBehaviour:
   - {fileID: 4548526875333577048, guid: 15d30e5c7d2f10248b93bda3a7f5cf4f, type: 3}
   - {fileID: 1286205753578684057, guid: 495d022fe302f9b408f6b29d72fea86e, type: 3}
   - {fileID: 6738442032925104237, guid: 1f799de0e108bb046af6da5a76752b99, type: 3}
-  signChance: 0.3
-  treeChance: 0.2
-  propChance: 0.15
   extraConnectionChance: 0.2
+  signChance: 0.3
   navMeshSurface: {fileID: 1476910810}
   gameMode: Single Player
 --- !u!4 &1476910809
@@ -4467,7 +4383,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameMenuManager
   cityGenerator: {fileID: 1476910808}
   mainMenuPanel: {fileID: 1004821436}
-  inGameMenuPanel: {fileID: 856540218}
   confirmPanel: {fileID: 2096889350}
   singlePlayerButtonObject: {fileID: 1256223881}
   multiplayerButtonObject: {fileID: 543494287}
