@@ -1,0 +1,28 @@
+Blog post #6 – Final game and reflection 
+
+The final game is a police chase game that can be played either as singleplayer or multiplayer. It has an automatically generated city that is different every time, 
+making sure no two runs are the same. The player must drive through the city, looking for an escape while being chased by a police car controlled either by another 
+player or by AI mechanics. In multiplayer mode, the screen turns into a split screen so both players can follow their own car around. The game is designed to be played 
+on an arcade with the main controls being the joystick.  
+
+When starting the game, the user is introduced to a game menu with animated buttons. They can then select a game mode and start the game. When the “start” button is 
+pressed, the CityGenerator creates the city and spawns the player(s) on a road tile that is guaranteed to be connected to the exit using a flood fill check. The player 
+can then drive around and try to find the exit while dodging the police car. If caught, a panel will appear, flashing red and blue, informing the player that they have 
+lost. They may choose to play again or return to the menu where they can exit the game or choose a different game mode. If the player manages to escape, the player car 
+will appear to drive off into the sunset using some scripted animation techniques, and a panel will appear, informing the player that they have won. Here they may 
+likewise choose to play again or return to the main menu. There is also a pause option, a pause button may be pressed at any time during the game, pausing it and 
+showing the pause panel in which the player can choose to exit or resume the game.  
+
+We’ve implemented most of the things we talked about in our initial planning of the game and a few things that came up along the way, but some things we discussed that 
+could be worked in if we continue working on the game are: 
+
+    Adding NPC cars and pedestrians and a proper traffic system to make the city feel more real and alive and add extra obstacles for the game. 
+
+    Adding difficulty, for example toggling the speed of the police car or even adding several police cars to the chase.  
+
+    A scoring system of some kind that might keep track of high scores and make it more competitive.  
+
+    More graphics and animations to add some life and whimsy to the game, for example in the end sequences or in the gameplay itself. 
+
+Beyond adding new features we could also work some more with the Police AI, making it better at the chase, possibly making it predict where the player is going rather 
+than ainming for where they are and/or making it better at not getting stuck or caught on corners. 
