@@ -1,0 +1,26 @@
+Blog Post 1 – Roll a Ball 
+
+When we started this project, we didn’t quite know what to expect. It was our very first time creating a game in Unity, and the beginning felt very strange and 
+confusing. There were many new concepts, and at first it was difficult to understand how everything worked together. However, as we continued working on the project, 
+things slowly started making sense. Step by step, we learned what each component does or how scripts communicate with objects. To be completely fair, the tutorials 
+were a huge help, which gave us the impression that developing a game was not extra complicated. We were definitely proved wrong in the next few weeks when we had to 
+start developing our own game. Even if we were guided the whole time, this project became an important learning experience, teaching us the basics of game development 
+that later helped us with our own game. It was also an important factor that we sat next to each other when creating the game, which gave us the opportunity to help 
+and correct each other when needed. 
+
+There were a few things that worked pretty well for us. One of them was creating the scene and the basic player movement. Using physics keyboard input made the ball 
+movement feel realistic and responsive. We also successfully implemented collectible pickups that disappear when touched by the player. Later in the project, we added 
+the AI navigation, which gave us an idea of how it worked since we had to implement it in our future game as well. 
+
+One of the issues we encountered happened while working with collisions and triggers. Sometimes pickups were not disappearing correctly, or the collision methods were 
+not being called because tags or colliders were missing. Debugging errors was another important learning experience. Incorrect variable names or forgotten references 
+often caused compilation errors. 
+
+If we were to continue working on this project, we would improve the visual design by adding better materials, lighting, and animations. The map itself could become 
+larger and more creative with obstacles and multiple levels. We could also improve it by adding sound effects and background music, multiple enemies, a timer system, a 
+start menu and restart button or different difficulty levels. 
+
+Overall, this project was a good learning experience. It taught us both technical skills and problem-solving skills. Even though we did encounter challenges, solving 
+then prepared us for what followed next – creating our own unique game 
+
+ 
