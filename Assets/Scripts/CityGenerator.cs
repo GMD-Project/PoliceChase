@@ -38,10 +38,10 @@ public class CityGenerator : MonoBehaviour
     [Header("Navigation")]
     public NavMeshSurface navMeshSurface;
 
-
     [Header("Game Mode")]
     public string gameMode = "Single Player";
 
+    [HideInInspector] public Vector3 exitWorldDirection;
     bool[,] roadGrid;
     Vector2Int exitTile;
     private Vector2Int _player1Tile;
@@ -306,6 +306,9 @@ public class CityGenerator : MonoBehaviour
             Vector2Int exit = exits[Random.Range(0, exits.Count)];
             roadGrid[exit.x, exit.y] = true;
             exitTile = exit;
+            exitTile = exit;
+            Vector2Int d = GetExitDirection();
+            exitWorldDirection = new Vector3(d.x, 0f, d.y);
         }
 
     }
