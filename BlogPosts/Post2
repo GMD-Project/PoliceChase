@@ -1,0 +1,32 @@
+Blog Post #2 – Game design and milestones 
+
+Making our police chase game has been a really fun experience, but also challenging at times. From the start, we wanted to create a game where one player could escape 
+while the other chased them through a city. To keep everything organized, we divided the project into milestones. Each milestone focused on different parts of the game 
+so we could build it step by step without getting overwhelmed. 
+
+Before we started coding, we spent some time discussing how we wanted the game to look and feel. The main idea was simple: A police chase game where a player drives 
+through a randomly generated city chased by a police car. The player would win by reaching the exit and lose if the police caught up with them before they could 
+escape.  
+
+We wanted to try and cover as many of the concepts from the course as we could without making it seem forced. We knew that some features would be harder to make than 
+others, especially multiplayer and city generation, so we planned the project carefully. Splitting the work into milestones helped us focus on one goal at a time. 
+
+The first milestone was all about creating the game world and spawning the cars inside. Since the entire game happens inside the city, this was the most important 
+place to start. We worked on generating the city and creating roads where the players could drive and buildings that made up the walls of the maze.  
+
+Another important part of this milestone was making the two cars appear in the right spot in the game. One car was for the police player and the other for the escaping 
+player. Even though it sounds simple, getting both cars to spawn correctly and work inside the city took more time than expected. 
+
+The second milestone focused on gameplay. After we had the city and cars spawning working, we started implementing the driving mechanics. A lot of testing was needed 
+because the cars either felt too slow, too fast, or difficult to control. We kept adjusting the settings until driving felt smoother and more natural. This is also 
+where we implemented the AI controlling the police car in singleplayer mode and learned that our assumption that multiplayer mode would be harder, was wrong. 
+
+The last milestone was focused more on polishing the game and making it feel complete. We added a game menu where players could start the game and choose between 
+multiplayer and single-player. We also added sounds like background music and other sounds during gameplay.  This made the police chases feel more exciting and 
+realistic. Without sound, the game felt empty, so this made a surprisingly big difference. 
+
+Another important thing we added was an ending to the game. Earlier in development, the game would just continue forever. We created win and lose conditions so the 
+chase could actually end. For example, the police could catch the other player, or the escaping player could survive long enough to win. 
+
+Overall, working with milestones helped us stay organized and made the project easier to manage. Each milestone added something important to the game, starting with 
+the city and cars, then adding gameplay mechanics, and finally improving the overall experience with menus, sounds, and endings.  
