@@ -1,0 +1,31 @@
+Blog Post #3 – First Milestone: City Generation 
+
+The first milestone of our police chase game focused on building the game world and making the two main cars appear correctly inside it. Even though this was only the 
+beginning of the project, it ended up being one of the more challenging parts because the entire gameplay depends on the city layout working properly. 
+
+At the start, we imported different assets and materials from the asset store to help us create the environment faster. However, once we started generating the city, 
+we quickly realized that things were not working the way we expected. Roads, buildings, and intersections were often placed randomly, which made the city look messy 
+and unrealistic. Some roads would suddenly end, others would overlap, and many areas simply did not make sense for driving gameplay. 
+
+One of our biggest problems was making sure the roads were logical. Since this is a police chase game, players need to be able to drive naturally through the city. We 
+had to make sure intersections and cross traffic lines looked normal and connected correctly. Otherwise, the map became confusing and difficult to play on. 
+
+Another issue was making sure every house or building was connected to at least one road. In early versions of the city generation, some houses were isolated with no 
+proper access, which made the environment feel broken. We spent a lot of time adjusting the generation system so the city would feel more realistic and organized. 
+
+We also wanted to avoid making the game too easy. At one point, some roads stretched directly from one side of the map to the other without obstacles or meaningful 
+turns. This removed the challenge from the police chase because players could simply drive in a straight line until reaching the escape road. To fix this, we 
+redesigned the road generation so the map encouraged turning, escaping, and decision-making during gameplay. (we can add some code snipperts here) 
+
+Another important thing we had to consider was route connectivity. We needed to make sure there was always a possible route through the city and that not every road 
+ended in a dead end. If too many roads were blocked or disconnected, the gameplay became frustrating instead of fun. Finding the right balance between open roads and 
+dead ends took a lot of testing and experimentation. 
+
+Alongside the city generation, we also worked on spawning the two vehicles into the game. One car represented the police player, while the other represented the 
+escaping player. We had to make sure the cars spawned in valid positions on the roads and did not collide with buildings or objects when the game started. 
+
+Even though this milestone was mostly focused on the environment, it taught us a lot about procedural generation and level design. It was much harder than we 
+originally expected because every small issue with the roads affected the gameplay directly. 
+
+By the end of the milestone, we finally had a city that felt playable and supported the kind of police chase experience we wanted to create. Seeing both cars driving 
+through a properly connected city was the moment when the project truly started to feel like a real game. 
