@@ -369,7 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca7d51f50e4df984db0c0dc210edab1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  speed: 20
+  speed: 24
   turnSpeed: 150
   isPlayer2: 1
 --- !u!54 &7727731293603042989

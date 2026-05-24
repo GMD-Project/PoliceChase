@@ -311,6 +311,8 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Enable();
         input.Menu.Navigate.performed += OnNavigate;
         input.Menu.Select.performed += OnSelect;
+        input.InGameAction.Enable();
+        input.InGameAction.Pause.performed += OnPausePressed;
         OnPlayerCaught += TriggerCaught;
         OnPlayerEscaped += TriggerEscaped;
     }
@@ -320,8 +322,11 @@ public class GameMenuManager : MonoBehaviour
         input.Menu.Navigate.performed -= OnNavigate;
         input.Menu.Select.performed -= OnSelect;
         input.Menu.Disable();
+        input.InGameAction.Pause.performed -= OnPausePressed;
+        input.InGameAction.Disable();
         OnPlayerCaught -= TriggerCaught;
         OnPlayerEscaped -= TriggerEscaped;
+        
     }
     private void OnPausePressed(InputAction.CallbackContext ctx)
     {
@@ -426,6 +431,10 @@ public class GameMenuManager : MonoBehaviour
             if (rb != null) rb.constraints = RigidbodyConstraints.FreezePositionY
                                         | RigidbodyConstraints.FreezeRotationX
                                         | RigidbodyConstraints.FreezeRotationZ;
+        }
+        if (playerCar != null && cityGenerator != null && cityGenerator.exitWorldDirection != Vector3.zero)
+        {
+            playerCar.transform.rotation = Quaternion.LookRotation(cityGenerator.exitWorldDirection, Vector3.up);
         }
 
         Camera mainCam = Camera.main;
