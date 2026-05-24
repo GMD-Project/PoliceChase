@@ -1,0 +1,54 @@
+Blog post #5 – Third milestone: Polish and menus 
+
+After the second milestone, we had a game that was playable from start to finish with the mechanics we wanted and win and lose endings. The last milestone was about 
+making it look nicer and more complete.  
+
+All the menus and the game flow are coordinated through the GameMenuManager. We used a static event pattern here to avoid the scripts being too tightly coupled  
+
+public static event Action OnPlayerCaught; 
+
+public static event Action OnPlayerEscaped; 
+
+public static void RaisePlayerCaught()  => OnPlayerCaught?.Invoke(); 
+
+public static void RaisePlayerEscaped() => OnPlayerEscaped?.Invoke(); 
+
+These events are fired from different scripts whenever the win or lose conditions are met and they initiate the end sequences, which were the next thing we improved 
+on.  
+
+From the start we had a vision of the winning sequence as the player cardriving off into the horizon when it escaped the city. We implemented this with a coroutine and 
+a lot of trial and error. We had to keep the car moving forward while disabling the TopDownCamera and reposition the camera angle. We also changed the 
+rendersettings.sun colour to try and emulate a sunset vibe. This is held for 4.5 seconds before the escapedPanel comes up 
+
+The lose sequence was also implemented with a coroutine, though a bit simpler. We froze the car and activated the caughtPanel immediately, making the background flash 
+red and blue to emulate the lights on a police car.  
+
+The pause and restart functions ended up causing us a bit of trouble. After a great deal of investgation and debugging, we realised that on restart, the scene wasn’t 
+disposed of properly so when the CityGenerator tried to generate the city, there were still remnants of the old city which caused a lot of problems. We solved this by 
+creating a StartGameRoutine 
+
+IEnumerator StartGameRoutine() 
+
+    { 
+
+        ClearCity(); 
+
+        yield return null;  
+
+        GenerateCity(); 
+
+    } 
+
+Initially we simply made the ClearCity method, which finds all elements in the city and destroys them before the city is then regenerated. However, we later learned 
+that the because the two methods, ClearCity and GenerateCity, were called in the same frame, the NavMesh still had the TileBlocker objects from the old city, causing 
+it to register invisible walls in the city. The ”yield return null;”, gives the ClearCity method time to destroy everything before the new city is generated. 
+
+With all the menus created, we had to make them navigable on the arcade where we don’t have a mouse. This turned out to be a rather simple process in which we added 
+action maps to navigate and select buttons and then created script methods to select and highlight the buttons accordingly.  
+
+Once the menus and end sequences were settled, we wanted to add some life to the game by adding audio. This also turned out to be much simpler than we had first 
+imagined and we managed to add separate soundtracks for the menus, the gameplay, and each of the end sequences using one method and calling it in the appropriate 
+methods. 
+
+By the end of this milestone the game had a complete loop: menu → mode selection → city generation → chase → end screen → replay or exit. Everything was connected and 
+the two endings felt meaningfully different from each other. 
