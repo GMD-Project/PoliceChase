@@ -1,0 +1,34 @@
+Blog Post #4 – Second Milestone: Driving mechanism  
+
+Once we had the city generated and both cars spawned, it was time to make the actual game mechanics and get the cars to move.  
+
+We used the new input system in unity to handle all the controls so that we could test the functionalities on our own laptops and build and test on the arcade without 
+having to make changes to the code. We had some challenges getting the arcade inputs right since we experienced both cars responding to inputs from both controllers. 
+To solve this, we had to bind each action map to a specific device 
+
+if (Gamepad.all.Count > 1) 
+
+    input.Player2.Get().devices = new[] { Gamepad.all[1] }; 
+
+But after doing so, the controls worked.  
+
+We decided to set the velocity directly whenever the “up” and “down” inputs were read rather than using the AddForce method since we felt it gave more of an arcade 
+feel to the steering.  
+
+There was a lot of trial and error in getting the driving mechanics to feel natural and fit them into the city, but once we had it, it wasn’t difficult to apply the 
+same functionalities to the police car for multiplayer. We had anticipated that multiplayer would be difficult to implement, but it turned out that the AI for the 
+singleplayer was the thing that would cause us the most problems.  
+
+It was a more technically challenging part of this milestone to create the AI that controlled the police car chasing the player in singleplayer mode. At first we did 
+much the same as what we had started with when we were making the city generation and we tried to keep guiding and overcomplicating the code by continuously adding 
+constraints and commands to try and force the behaviour we wanted. We managed to make something that was somewhat decent but neither of us were really satisfied. It 
+had a tendency to get stuck on corners and not be able to unstick itself, making it very easy to escape.  
+
+In the end we had to rethink this as well and we ended up rewriting a lot of it and using NavMeshAgent to handle the pathfinding and directing the police car towards 
+the player using the available roads. We still used the same physics calls to drive the police car rather than having the NavMeshAgent drive it directly, since this 
+seemed to work the best. There were still a few kinks in the controls, but the states, chasing, recovering, and caught, helped handle some of the problems, but there 
+was again a lot of trial and error. For example, the chase state looks forward in the path to find the point to steer towards and we had to adjust how far ahead it 
+looked so it actually had time to react and turn when a corner was coming up. 
+
+The biggest problems in this milestone were making the AI smart enough to make the chase challenging. We had to increase the path lookahead to avoid the police car 
+getting stuck when it had to make sharp turns. By the end of this milestone, we had a game that felt playable in both modes, singleplayer and multiplayer. 
